@@ -10,6 +10,7 @@
 #include "Epoll.h"
 #include "InetAddress.h"
 #include "Socket.h"
+#include "Channel.h"
 
 char buf[READ_BUFFER];
 
@@ -24,17 +25,20 @@ int main()
     serv_sock.bind(&serv_addr);
     serv_sock.listen();
     serv_sock.setnonblocking();
-    set_ev(ev, serv_sock.getFd(), EPOLLIN | EPOLLET);
-    epoll.ctl(EPOLL_CTL_ADD, serv_sock.getFd(), &ev);
+
+    Channel* serv_chl = new Channel(&epoll, serv_sock.getFd());
+    serv_chl->channel_ctl();
     while (true) {
         auto events = epoll.wait();
         for (auto& event : events) {
-            if (int fd = event.data.fd; fd == serv_sock.getFd()) {//新客户端连接
+            Channel* channel = (Channel*)(event.data.ptr);
+            if (int fd = channel->getFD(); fd == serv_sock.getFd()) {//新客户端连接
                 printf("新客户端连接\n");
                 int clnt_sockfd = serv_sock.accept(&clnt_addr);
                 setnonblocking(clnt_sockfd);
-                set_ev(ev, clnt_sockfd, EPOLLIN | EPOLLET);
-                epoll.ctl(EPOLL_CTL_ADD, clnt_sockfd, &ev);
+
+                Channel* clnt_chl = new Channel(&epoll, clnt_sockfd);
+                clnt_chl->channel_ctl();
             }
             else if (event.events & EPOLLIN) {      //可读事件
                 handing(fd);

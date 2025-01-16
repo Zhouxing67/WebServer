@@ -7,6 +7,7 @@
 #include <sys/epoll.h>
 #include <vector>
 
+class Channel;
 using std::vector;
 class Epoll {
 private:
@@ -15,9 +16,13 @@ private:
 public:
     Epoll();
     ~Epoll();
-    void ctl(int type, int fd, epoll_event* ev);
+    void ctl(int op, int fd, epoll_event* ev);
     vector<epoll_event> wait(int timeout = -1);
+    //管理Channel;
+    void handleChannel(Channel* chl);
 };
 
 void set_ev(epoll_event& ev, int fd, int events);
+void set_ev(epoll_event& ev, epoll_data_t data, int events);
+
 #endif
