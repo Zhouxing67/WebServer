@@ -4,10 +4,14 @@
 #include "Channel.h"
 #include "Socket.h"
 
-
+/*
+参见：
+https://github.com/Wlgls/30daysCppWebServer中day6
+ */
 class Server {
 private:
     EventLoop* loop_ = nullptr;
+
 public:
     Server(EventLoop* loop);
     ~Server();

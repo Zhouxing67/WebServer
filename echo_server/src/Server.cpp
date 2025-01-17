@@ -4,36 +4,36 @@
 #include <string.h>
 #include <errno.h>
 
+
 #define BUFSIZE 1024
 using std::bind;
 
-Server::Server(EventLoop* loop) : loop_(loop)
+Server::Server(EventLoop *loop) : loop_(loop)
 {
     Socket *serv_sock = new Socket();
-    InetAddress* serv_addr = new InetAddress("127.0.0.1", 8888);
+    InetAddress *serv_addr = new InetAddress("127.0.0.1", 8888);
     serv_sock->bind(serv_addr);
     serv_sock->listen();
     serv_sock->setnonblocking();
 
     function<void()> cb = [this, serv_sock]() {this->newConnection(serv_sock); };
-    Channel* serv_chl = new Channel(loop, serv_sock->getFd(), cb);
+    Channel *serv_chl = new Channel(loop, serv_sock->getFd(), cb);
     //serv_chl->setcallback(cb);
     serv_chl->channel_ctl();
 }
 
 Server::~Server()
-{
-}
+{ }
 
-void Server::newConnection(Socket* serv_sock)
+void Server::newConnection(Socket *serv_sock)
 {
-    InetAddress* clnt_addr = new InetAddress;
+    InetAddress *clnt_addr = new InetAddress;
     Socket *clnt_sock = serv_sock->accept(clnt_addr);
     clnt_sock->setnonblocking();
 
-    function<void()> cb = [clnt_sock, this]() {this->handleEvent(clnt_sock->getFd());};
-    Channel* clnt_chl = new Channel(loop_, clnt_sock->getFd(), cb);
-   // clnt_chl->setcallback(cb);
+    function<void()> cb = [clnt_sock, this]() {this->handleEvent(clnt_sock->getFd()); };
+    Channel *clnt_chl = new Channel(loop_, clnt_sock->getFd(), cb);
+    // clnt_chl->setcallback(cb);
     clnt_chl->channel_ctl();
 }
 

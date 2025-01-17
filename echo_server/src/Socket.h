@@ -5,17 +5,18 @@ class InetAddress;
 class Socket
 {
 private:
-    int fd;
+    int fd_ = -1;
 public:
     Socket();
     Socket(int);
     ~Socket();
 
+    int getFd() { return fd_; }
+
     void bind(InetAddress*);
     void listen();
     void setnonblocking();
     Socket* accept(InetAddress*);
-    int getFd();
 };
 #endif
 

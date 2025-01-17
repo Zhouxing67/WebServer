@@ -6,7 +6,8 @@ class InetAddress
 {
 public:
     struct sockaddr_in addr;
-    socklen_t addr_len;
+    socklen_t addr_len = sizeof(addr);
+public:
     InetAddress();
     InetAddress(const char* ip, uint16_t port);
     ~InetAddress();

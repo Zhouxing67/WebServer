@@ -5,9 +5,7 @@
 
 epoll_event EventLoop::Epoll::events[MAX_EVENTS];
 EventLoop::EventLoop() : ep_(new Epoll())
-{
-
-}
+{}
 
 EventLoop::~EventLoop()
 {
@@ -73,13 +71,6 @@ void EventLoop::Epoll::ctl(int op, int fd, epoll_event* ev)
     errif(-1 == epoll_ctl(epfd_, op, fd, ev), "epoll_ctl error");
 }
 
-
-void set_ev(epoll_event& ev, int fd, int events)
-{
-    bzero(&ev, sizeof(ev));
-    ev.data.fd = fd;
-    ev.events = events;
-}
 
 void set_ev(epoll_event& ev, epoll_data_t  data, int events)
 {

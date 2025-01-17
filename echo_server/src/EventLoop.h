@@ -9,7 +9,6 @@
 class Channel;
 using std::vector;
 
-void set_ev(epoll_event& ev, int fd, int events);
 void set_ev(epoll_event& ev, epoll_data_t data, int events);
 
 class EventLoop {
@@ -17,7 +16,7 @@ private:
     class Epoll;
     Epoll* ep_ = nullptr;
     bool quit_ = false;
-
+    //核心嵌套类，实现事件循环
     class Epoll {
     private:
         int epfd_ = -1;
@@ -26,6 +25,7 @@ private:
         Epoll();
         ~Epoll();
         void ctl(int op, int fd, epoll_event* ev);
+        //返回被触发的Channel
         vector<Channel*> poll(int timeout = -1);
         //管理Channel;
         void handleChannel(Channel* chl);
@@ -33,9 +33,10 @@ private:
 public:
     EventLoop();
     ~EventLoop();
+    void quit() { quit_ = true; }
+
     //监听channel
     void handleChannel(Channel* chl);
     void loop();
-    void quit() { quit_ = true; }
 };
 #endif
