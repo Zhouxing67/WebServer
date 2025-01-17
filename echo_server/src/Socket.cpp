@@ -40,10 +40,10 @@ void Socket::setnonblocking()
     ::setnonblocking(fd_);
 }
 
-Socket* Socket::accept(InetAddress* addr)
+Socket* Socket::accept(InetAddress* inet_addr)
 {
-    int clnt_sockfd = ::accept(fd_, (sockaddr*)&addr->addr, &addr->addr_len);
+    int clnt_sockfd = ::accept(fd_, (sockaddr *)&inet_addr->addr, &inet_addr->addr_len);
     errif(clnt_sockfd == -1, "socket accept error");
-    printf("new client fd_ %d! IP: %s Port: %d\n", clnt_sockfd, inet_ntoa(addr->addr.sin_addr), ntohs(addr->addr.sin_port));
+    printf("new client fd_ %d! IP: %s Port: %d\n", clnt_sockfd, inet_ntoa(inet_addr->addr.sin_addr), ntohs(inet_addr->addr.sin_port));
     return new Socket(clnt_sockfd);
 }

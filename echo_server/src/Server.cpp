@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
+#include "Acceptor.h"
 
 
 #define BUFSIZE 1024
@@ -10,16 +11,9 @@ using std::bind;
 
 Server::Server(EventLoop *loop) : loop_(loop)
 {
-    Socket *serv_sock = new Socket();
-    InetAddress *serv_addr = new InetAddress("127.0.0.1", 8888);
-    serv_sock->bind(serv_addr);
-    serv_sock->listen();
-    serv_sock->setnonblocking();
-
-    function<void()> cb = [this, serv_sock]() {this->newConnection(serv_sock); };
-    Channel *serv_chl = new Channel(loop, serv_sock->getFd(), cb);
-    //serv_chl->setcallback(cb);
-    serv_chl->channel_ctl();
+    accptor_ = new Acceptor(loop_);
+    function<void(Socket *)> accptor_cb = [this](Socket *sock) {this->newConnection(sock); };
+    accptor_->set_cb(accptor_cb);
 }
 
 Server::~Server()
