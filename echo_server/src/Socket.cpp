@@ -38,12 +38,12 @@ void Socket::setnonblocking()
     fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) | O_NONBLOCK);
 }
 
-int Socket::accept(InetAddress* addr)
+Socket* Socket::accept(InetAddress* addr)
 {
     int clnt_sockfd = ::accept(fd, (sockaddr*)&addr->addr, &addr->addr_len);
     errif(clnt_sockfd == -1, "socket accept error");
     printf("new client fd %d! IP: %s Port: %d\n", clnt_sockfd, inet_ntoa(addr->addr.sin_addr), ntohs(addr->addr.sin_port));
-    return clnt_sockfd;
+    return new Socket(clnt_sockfd);
 }
 
 int Socket::getFd()

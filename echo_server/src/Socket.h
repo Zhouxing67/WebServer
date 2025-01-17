@@ -14,7 +14,7 @@ public:
     void bind(InetAddress*);
     void listen();
     void setnonblocking();
-    int accept(InetAddress*);
+    Socket* accept(InetAddress*);
     int getFd();
 };
 #endif
