@@ -18,12 +18,15 @@ namespace
 
 class Channel {
 private:
-    EventLoop* loop_ = nullptr;  // 所属的 EventLoop
+    friend class EventLoop;
+    EventLoop *loop_ = nullptr;  // 所属的 EventLoop
     int fd_ = -1;                // 监听的 FD
     uint32_t events_ = -1;       // 关注的事件
     uint32_t revents_ = -1;      // 已触发的事件
     bool is_ctl_ = false;        // 是否已注册到 epoll
     function<void()> callback_;  // 事件处理函数
+
+    void set_revents(uint32_t revents) { revents_ = revents; }
 public:
     Channel();
     //个人认为初始化Channel时就应该设置事件处理函数
@@ -32,12 +35,11 @@ public:
     //设置关注事件（默认为ET触发模模式的可读事件），并通知epoll实例进行对自身的注册或更改
     void channel_ctl(unsigned int events = EPOLLIN | EPOLLET);
 
-    void setcallback(std::function<void()> cb) { callback_ = cb; }
-    void set_revents(uint32_t revents) { revents_ = revents; }
+    void set_callback(std::function<void()> cb) { callback_ = cb; }
 
     int getFD() { return fd_; }
-    uint32_t events() { return events_; }
     uint32_t revents() { return revents_; }
+    uint32_t events() { return events_; }
     bool is_ctl()
     {
         bool res = is_ctl_;
@@ -46,7 +48,7 @@ public:
     }
 
     //当感兴趣的事件被触发时，调用此函数处理该事件
-    void handleEvent();
+    void handle_event();
 
 };
 #endif

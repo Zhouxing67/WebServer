@@ -25,9 +25,9 @@ Socket::~Socket()
     }
 }
 
-void Socket::bind(InetAddress* addr)
+void Socket::bind(InetAddress *addr)
 {
-    errif(::bind(fd_, (sockaddr*)&addr->addr, addr->addr_len) == -1, "socket bind error");
+    errif(::bind(fd_, (sockaddr *)&addr->addr, addr->addr_len) == -1, "socket bind error");
 }
 
 void Socket::listen()
@@ -40,10 +40,14 @@ void Socket::setnonblocking()
     ::setnonblocking(fd_);
 }
 
-Socket* Socket::accept(InetAddress* inet_addr)
+Socket *Socket::accept(InetAddress *inet_addr)
 {
-    int clnt_sockfd = ::accept(fd_, (sockaddr *)&inet_addr->addr, &inet_addr->addr_len);
+    auto addr = (sockaddr *)&inet_addr->addr;
+    auto addr_len = &inet_addr->addr_len;
+    int clnt_sockfd = ::accept(fd_, addr, addr_len);
+    
     errif(clnt_sockfd == -1, "socket accept error");
-    printf("new client fd_ %d! IP: %s Port: %d\n", clnt_sockfd, inet_ntoa(inet_addr->addr.sin_addr), ntohs(inet_addr->addr.sin_port));
+    printf("new client fd_ %d! IP: %s Port: %d\n", clnt_sockfd,
+        inet_ntoa(inet_addr->addr.sin_addr), ntohs(inet_addr->addr.sin_port));
     return new Socket(clnt_sockfd);
 }

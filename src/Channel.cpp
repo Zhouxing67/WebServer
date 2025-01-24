@@ -11,10 +11,10 @@ Channel::~Channel()
 void Channel::channel_ctl(unsigned int events)
 {
     events_ = events;
-    loop_->handleChannel(this);
+    loop_->handle_channel(this);
 }
 
-void Channel::handleEvent()
+void Channel::handle_event()
 {
     callback_();
 }

@@ -21,6 +21,8 @@ private:
 public:
     Connection();
     Connection(EventLoop *loop, Socket *clnt_sock);
+    Connection(const Connection &other) = delete;
+    Connection &operator=(const Connection &other) = delete;
     ~Connection();
 
     void release_conn();

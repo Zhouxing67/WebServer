@@ -28,7 +28,7 @@ private:
         //返回被触发的Channel
         vector<Channel*> poll(int timeout = -1);
         //管理Channel;
-        void handleChannel(Channel* chl);
+        void handle_channel(Channel* chl);
     };
 public:
     EventLoop();
@@ -36,7 +36,7 @@ public:
     void quit() { quit_ = true; }
 
     //监听channel
-    void handleChannel(Channel* chl);
+    void handle_channel(Channel* chl);
     void loop();
 };
 #endif

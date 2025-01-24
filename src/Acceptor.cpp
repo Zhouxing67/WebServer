@@ -1,8 +1,6 @@
 #include "Acceptor.h"
 #include "Channel.h"
 
-
-
 Acceptor::Acceptor()
 { }
 
@@ -14,8 +12,8 @@ Acceptor::Acceptor(EventLoop *loop) : loop_(loop)
     sock_->listen();
     sock_->setnonblocking();
 
-    function<void()> chl_db = [this]() {this->accept_connection(); };
-    chl_ = new Channel(loop_, sock_->getFd(), chl_db);
+    function<void()> chl_cb = [this]() {this->accept_connection(); };
+    chl_ = new Channel(loop_, sock_->getFd(), chl_cb);
     chl_->channel_ctl();
 }
 

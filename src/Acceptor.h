@@ -21,11 +21,12 @@ private:
     Socket *sock_ = nullptr;
     InetAddress *inet_addr_ = nullptr;
     Channel *chl_ = nullptr;
-
     function<void(Socket *)> new_conn_cb_; //接受TCP连接的具体行为，通过回调函数将其具体实现委派给Server类
 public:
     Acceptor();
     Acceptor(EventLoop *loop);
+    Acceptor(const Acceptor &other) = delete;
+    Acceptor &operator=(const Acceptor &other) = delete;
     ~Acceptor();
 
     void set_cb(function<void(Socket *)> cb) { new_conn_cb_ = cb; }

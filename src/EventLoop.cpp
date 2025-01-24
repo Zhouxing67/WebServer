@@ -13,12 +13,12 @@ EventLoop::~EventLoop()
     ep_ = nullptr;
 }
 
-void EventLoop::handleChannel(Channel* chl)
+void EventLoop::handle_channel(Channel* chl)
 {
-    ep_->handleChannel(chl);
+    ep_->handle_channel(chl);
 }
 
-void EventLoop::Epoll::handleChannel(Channel* chl)
+void EventLoop::Epoll::handle_channel(Channel* chl)
 {
     epoll_event ev;
     epoll_data_t data;
@@ -50,7 +50,7 @@ void EventLoop::loop()
     while (!quit_) {
         auto activeChannels = ep_->poll();
         for (auto channel : activeChannels)
-            channel->handleEvent();
+            channel->handle_event();
     }
 }
 
