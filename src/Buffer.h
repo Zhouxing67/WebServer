@@ -2,8 +2,11 @@
 #define BUFFER_H
 
 #include <string>
+#include <iostream>
 
 using std::string;
+using std::ostream;
+using std::istream;
 
 class Buffer
 {
@@ -17,5 +20,7 @@ public:
     
     void append(const char *str, int size);
     void clear() { buf_.clear(); }
+    void getline(istream &is = std::cin);
+    void set_buf(const char *);
 };
 #endif

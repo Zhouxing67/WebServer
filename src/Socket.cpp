@@ -51,3 +51,9 @@ Socket *Socket::accept(InetAddress *inet_addr)
         inet_ntoa(inet_addr->addr.sin_addr), ntohs(inet_addr->addr.sin_port));
     return new Socket(clnt_sockfd);
 }
+
+void Socket::connect(InetAddress *inet_addr)
+{
+    struct sockaddr_in addr = inet_addr->addr;
+    errif(::connect(fd_, (sockaddr *)&addr, sizeof(addr)) == -1, "socket connect error");
+}

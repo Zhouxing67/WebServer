@@ -16,7 +16,8 @@ public:
     void bind(InetAddress*);
     void listen();
     void setnonblocking();
-    Socket* accept(InetAddress*);
+    Socket *accept(InetAddress *);
+    void connect(InetAddress *);
 };
 #endif
 

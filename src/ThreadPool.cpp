@@ -34,13 +34,4 @@ ThreadPool::~ThreadPool()
     }
 }
 
-void ThreadPool::en_que(function<void()> &&func)
-{
-    {
-        unique_lock ulock(mut_);
-        if (stop_)
-            throw std::runtime_error("ThreadPool stopped!!!");
-        tasks_.push(std::move(func));
-    }
-    cv_.notify_one();
-}
+

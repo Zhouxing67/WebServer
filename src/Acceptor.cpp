@@ -10,11 +10,10 @@ Acceptor::Acceptor(EventLoop *loop) : loop_(loop)
     inet_addr_ = new InetAddress("127.0.0.1", 8888);
     sock_->bind(inet_addr_);
     sock_->listen();
-    sock_->setnonblocking();
 
     function<void()> chl_cb = [this]() {this->accept_connection(); };
     chl_ = new Channel(loop_, sock_->getFd(), chl_cb);
-    chl_->channel_ctl();
+    chl_->channel_ctl(EPOLLIN);
 }
 
 Acceptor::~Acceptor()
