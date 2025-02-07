@@ -10,6 +10,7 @@ Acceptor 类的职责可以看作是 网络连接的接受者。
 这样可以确保 Acceptor 类的设计简单且专注于其核心职责，不涉及处理连接的具体细节。
 */
 #include <functional>
+#include "Channel.h"
 #include "Socket.h"
 #include "EventLoop.h"
 #include "InetAddress.h"

@@ -1,5 +1,4 @@
 #include "Acceptor.h"
-#include "Channel.h"
 
 Acceptor::Acceptor()
 { }

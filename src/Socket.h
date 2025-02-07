@@ -1,7 +1,8 @@
 #ifndef SOCKET_H
 #define SOCKET_H
 
-class InetAddress;
+#include "InetAddress.h"
+
 class Socket
 {
 private:

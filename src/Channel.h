@@ -6,15 +6,11 @@ Channel 类是一个对文件描述符 (file descriptor, FD) 的封装
 epoll_event中的epoll_data是一个union，包含void*类型的ptr，通过ptr可以绑定任何我们自定义的类型
 fd与其对应的channel通过epoll_ctl注册到内核中的epoll实例里，其中channel被绑定到ptr上；具体由EventLoop::handleChannel实现
  */
-#include "EventLoop.h"
 #include <functional>
-
+#include <cstdint>
+#include <sys/epoll.h>
+#include "EventLoop.h"
 using std::function;
-
-namespace
-{
-    void noOp() { }
-}
 
 class Channel {
 private:
@@ -30,14 +26,13 @@ private:
 public:
     Channel();
     //个人认为初始化Channel时就应该设置事件处理函数
-    Channel(EventLoop* loop, int fd, function<void()> = noOp);
+    Channel(EventLoop* loop, int fd, function<void()> func = []{});
     ~Channel();
     //设置关注事件（默认为ET触发模模式的可读事件），并通知epoll实例进行对自身的注册或更改
     void channel_ctl(unsigned int events = EPOLLIN | EPOLLET);
-
     void set_callback(std::function<void()> cb) { callback_ = cb; }
 
-    int getFD() { return fd_; }
+    int fd() { return fd_; }
     uint32_t revents() { return revents_; }
     uint32_t events() { return events_; }
     bool is_ctl()

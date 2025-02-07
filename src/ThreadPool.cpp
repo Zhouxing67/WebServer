@@ -8,6 +8,7 @@ ThreadPool::ThreadPool(unsigned int concurrency)
                 function<void()> task;
                 {
                     unique_lock<mutex> ulock(mut_);
+                    //等待stop_ 或者 ！tasks_.empty()
                     cv_.wait(ulock, [this] {return stop_ || !tasks_.empty(); });
                     if (stop_ && tasks_.empty())
                         return;

@@ -1,5 +1,4 @@
 #include "Socket.h"
-#include "InetAddress.h"
 #include "Util.h"
 #include <unistd.h>
 #include <stdio.h>

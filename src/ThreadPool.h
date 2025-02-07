@@ -47,9 +47,9 @@ template<class F, class... Args>
 auto ThreadPool::en_que(F &&f, Args&&... args)->future<invoke_result_t<F, Args...>>
 {
     using result_type = invoke_result_t<F, Args...>;
-    auto task = make_shared< packaged_task<result_type(void)> >{  //使用智能指针
+    auto task = make_shared< packaged_task<result_type(void)> >(  //使用智能指针
         std::bind(forward<F>(f), forward<Args>(args)...)  //完美转发参数
-    };
+    );
     auto fut = task->get_future();
     {
         lock_guard<mutex> loc(mut_);
