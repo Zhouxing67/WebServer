@@ -1,11 +1,11 @@
-src=$(wildcard src/*.cpp)
+TCP=$(wildcard tcp/*.cpp)
 
 server:
 	g++ -std=c++17 -pthread -g \
-	$(src) \
+	$(TCP) \
 	main.cpp \
 	-o server
-
+	
 
 clean:
 	rm server 

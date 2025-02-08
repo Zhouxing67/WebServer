@@ -10,27 +10,37 @@ Acceptor 类的职责可以看作是 网络连接的接受者。
 这样可以确保 Acceptor 类的设计简单且专注于其核心职责，不涉及处理连接的具体细节。
 */
 #include <functional>
+#include <unistd.h>
+#include <stdio.h>
+#include <fcntl.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <cstring>
+#include <memory>
 #include "Channel.h"
-#include "Socket.h"
 #include "EventLoop.h"
-#include "InetAddress.h"
+#include "common.h"
 
 using std::function;
+using std::unique_ptr;
+
 class Acceptor {
-private:
-    EventLoop *loop_ = nullptr;
-    Socket *sock_ = nullptr;
-    InetAddress *inet_addr_ = nullptr;
-    Channel *chl_ = nullptr;
-    function<void(Socket *)> new_conn_cb_; //接受TCP连接的具体行为，通过回调函数将其具体实现委派给Server类
 public:
-    Acceptor();
-    Acceptor(EventLoop *loop);
-    Acceptor(const Acceptor &other) = delete;
-    Acceptor &operator=(const Acceptor &other) = delete;
+    DISALLOW_COPY_AND_MOV(Acceptor);
+    Acceptor(EventLoop *loop, const char* ip4, uint16_t port);
+    Acceptor() = default;
     ~Acceptor();
 
-    void set_cb(function<void(Socket *)> cb) { new_conn_cb_ = cb; }
+    void set_new_conn_callback(const function<void(int)> &cb) { new_conn_callback_ = cb; }
     void accept_connection();
+    void Create();
+    void Bind(const char *ip, const int port);
+    void Listen();
+
+private:
+    EventLoop *loop_ = nullptr;
+    unique_ptr<Channel> chl_;
+    int listenfd_ = -1;
+    function<void(int)> new_conn_callback_; //接受TCP连接的具体行为，通过回调函数将其具体实现委派给Server类
 };
 #endif

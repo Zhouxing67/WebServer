@@ -1,0 +1,70 @@
+#include "Acceptor.h"
+#include <cassert>
+#include <iostream>
+
+using std::make_unique;
+using std::cout;
+using std::endl;
+
+
+Acceptor::Acceptor(EventLoop *loop, const char *ip4, uint16_t port) : loop_(loop)
+{
+    Create();
+    Bind(ip4, port);
+    Listen();
+
+    function<void()> callback = [this] {accept_connection(); };
+    cout << (bool)callback << endl;
+    chl_ = make_unique<Channel>(listenfd_, loop_);
+    chl_->set_read_callback(callback);
+    chl_->enable_read();
+}
+
+Acceptor::~Acceptor()
+{ }
+
+void Acceptor::Create()
+{
+    assert(listenfd_ == -1);
+    listenfd_ = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK | SOCK_CLOEXEC, IPPROTO_TCP);
+    if (listenfd_ == -1) {
+        cout << "Failed to create socket" << endl;
+    }
+}
+
+void Acceptor::Bind(const char *ip, const int port)
+{
+    struct sockaddr_in addr;
+    memset(&addr, 0, sizeof(addr));
+    addr.sin_family = AF_INET;
+    addr.sin_addr.s_addr = inet_addr(ip);
+    addr.sin_port = htons(port);
+
+    if (::bind(listenfd_, (struct sockaddr *)&addr, sizeof(addr)) == -1) {
+        cout << "Failed to Bind : " << ip << ":" << port << endl;
+    }
+}
+
+void Acceptor::Listen()
+{
+    assert(listenfd_ != -1);
+    if (::listen(listenfd_, SOMAXCONN) == -1) {
+        cout << "Failed to Listen" << endl;
+    }
+}
+
+void Acceptor::accept_connection()
+{
+    struct sockaddr_in client;
+    socklen_t client_addrlength = sizeof(client);
+    assert(listenfd_ != -1);
+
+    int clnt_fd = ::accept4(listenfd_, (struct sockaddr *)&client, &client_addrlength, SOCK_NONBLOCK | SOCK_CLOEXEC);
+    if (clnt_fd == -1)
+        cout << "Failed to Accept" << endl;
+    if (new_conn_callback_)
+    {
+        new_conn_callback_(clnt_fd);
+    }
+    
+}
