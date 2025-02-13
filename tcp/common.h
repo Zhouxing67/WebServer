@@ -12,4 +12,7 @@
 #define DISALLOW_COPY_AND_MOV(cname)     \
     DISALLOW_COPY(cname)                 \
     DISALLOW_MOV(cname) 
+
+void print_if(bool cond, const char *msg);
 #endif
+
