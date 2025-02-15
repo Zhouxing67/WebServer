@@ -4,7 +4,10 @@
 #include "Util.h"
 #include <string.h> 
 #include <iostream>
+#include <mutex>
 
+using std::mutex;
+using std::lock_guard;
 
 EventLoop::EventLoop()
 {
@@ -23,12 +26,30 @@ void EventLoop::delete_channel(Channel *chl) const
     poller_->delete_channel(chl);
 }
 
+void EventLoop::add_one_func(function<void()> fn)
+{
+    lock_guard<mutex> lock(mut_);
+    todolist_.emplace_back(std::move(fn));
+}
+
+void EventLoop::do_todolist()
+{
+    vector<function<void()>> list;
+    {
+        lock_guard<mutex> lock(mut_);
+        list.swap(todolist_);
+    }
+    for(auto &fn : list)
+        fn();
+}
+
 //每次事件循环，获取被触发的channel列表，让每一个活动channel处理自己的事件
-void EventLoop::loop() const
+void EventLoop::loop() 
 {
     while (true) {
         auto activeChannels = poller_->poll();
         for (auto channel : activeChannels)
             channel->handle_event();
     }
+    do_todolist();
 }

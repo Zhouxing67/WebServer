@@ -4,8 +4,8 @@ server:
 	g++ -std=c++17 -pthread -g \
 	$(TCP) \
 	main.cpp \
-	-o server
+	-o ./bin/server-release
 	
 
 clean:
-	rm server 
+	rm ./bin/server* 

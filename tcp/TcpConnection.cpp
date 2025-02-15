@@ -21,7 +21,6 @@ TcpConnection::TcpConnection(EventLoop *loop, int connfd, int connid) : connfd_(
         channel_ = std::make_unique<Channel>(connfd, loop);
         channel_->enable_ET();
         channel_->set_read_callback([this] {this->handle_message(); });
-        channel_->enable_read();
     }
     read_buf_ = std::make_unique<Buffer>();
     send_buf_ = std::make_unique<Buffer>();
@@ -47,20 +46,32 @@ void TcpConnection::Send(const char *msg)
 void TcpConnection::handle_message()
 {
     Read();
-    if (state_ == ConnectionState::Disconected)
-        return;
     if (on_message_)
-        on_message_(this);
+        on_message_(shared_from_this());
 }
 
 void TcpConnection::handle_close()
 {
     if (state_ != ConnectionState::Disconected)
     {
-        state_ == ConnectionState::Disconected;
+        state_ = ConnectionState::Disconected;
         if (on_close_)
-            on_close_(connfd_);
+            on_close_(shared_from_this());
     }
+}
+
+void TcpConnection::establish_connection()
+{
+    state_ = ConnectionState::Connected;
+    channel_->Tie(shared_from_this());
+    channel_->enable_read();
+    if(on_connect_)
+        on_connect_(shared_from_this());
+}
+
+void TcpConnection::delete_connection()
+{
+    loop_->delete_channel(channel_.get());
 }
 
 void TcpConnection::Read()

@@ -20,8 +20,30 @@ void Channel::enable_ET()
 
 void Channel::handle_event() const
 {
+    if (tied_)
+        handle_event_with_guard();
+    else
+        handle_event_without_guard();
+}
+
+void Channel::handle_event_with_guard() const
+{
+    shared_ptr<void> guard = tie_.lock();
+    handle_event_without_guard();
+}
+
+void Channel::handle_event_without_guard() const
+{
     if (is_read_event() && read_callback_)
         read_callback_();
     if (is_write_event() && write_callback_)
         write_callback_();
 }
+
+void Channel::Tie(const shared_ptr<void> &obj)
+{
+    tie_ = obj;
+    tied_ = true;
+}
+
+

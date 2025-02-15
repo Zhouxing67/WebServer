@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
 
     TcpServer *server = new TcpServer("127.0.0.1", 8888);
 
-    server->set_message_callback([](TcpConnection *conn) {
+    server->set_message_callback([](shared_ptr<TcpConnection> conn) {
         auto clnt_msg = conn->Rbuf_data();
         if (strlen(clnt_msg) > 0) {
             std::cout << "Message from client " << conn->id() << " is " << clnt_msg << std::endl;

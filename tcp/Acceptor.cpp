@@ -14,7 +14,6 @@ Acceptor::Acceptor(EventLoop *loop, const char *ip4, uint16_t port) : loop_(loop
     Listen();
 
     function<void()> callback = [this] {accept_connection(); };
-    cout << (bool)callback << endl;
     chl_ = make_unique<Channel>(listenfd_, loop_);
     chl_->set_read_callback(callback);
     chl_->enable_read();

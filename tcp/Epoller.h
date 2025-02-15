@@ -25,7 +25,7 @@ public:
 
 private:
     int epfd_ = -1;
-    static epoll_event events[MAX_EVENTS];
+    epoll_event *events_ = nullptr;
     
     void ctl(int op, int fd, epoll_event *ev)
     {

@@ -8,19 +8,20 @@
 #include <memory>
 #include "common.h"
 #include "EventLoop.h"
-
+#include "TcpConnection.h"
 using std::unordered_map;
 using std::vector;
 using std::random_device;
 using std::uniform_int_distribution;
 using std::function;
 using std::unique_ptr;
+using std::shared_ptr;
 
 
 class Channel;
-class TcpConnection;
 class ThreadPool;
 class Acceptor;
+using TcpConnectionCallbcak = TcpConnection::TcpConnectionCallback; 
 
 class TcpServer
 {
@@ -30,21 +31,23 @@ public:
     ~TcpServer();
 
     void Start();
-    void set_connection_callback(function < void(TcpConnection *)> const &fn) { on_connect_ = fn; }
-    void set_message_callback(function < void(TcpConnection *)> const &fn) { on_message_ = fn; }
-    void handle_close(int fd);
+    void set_connection_callback(TcpConnectionCallbcak fn) { on_connect_ = std::move(fn); }
+    void set_message_callback(TcpConnectionCallbcak fn) { on_message_ = std::move(fn); }
+    
+    void handle_close(const shared_ptr<TcpConnection> &conn);
     void handle_new_connection(int fd);
 
 private:
     unique_ptr<EventLoop> main_reactor_;
-    int next_conn_id_;
+    
     unique_ptr<Acceptor> acceptor_;
     vector<unique_ptr<EventLoop>> sub_reactors_;
-    unordered_map<int, TcpConnection *> connectionsMap_;
+    unordered_map<int, shared_ptr<TcpConnection>>connectionsMap_;
     unique_ptr<ThreadPool> thread_pool_;
 
-    function<void(TcpConnection *)> on_connect_;
-    function<void(TcpConnection *)> on_message_;
+    TcpConnectionCallbcak on_message_;
+    TcpConnectionCallbcak on_connect_;
+    mutex mut_;
 
 };
 

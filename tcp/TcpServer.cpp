@@ -13,7 +13,7 @@ using std::make_unique;
 using std::cout;
 using std::endl;
 
-TcpServer::TcpServer(const char *ip, const int port) : next_conn_id_(1)
+TcpServer::TcpServer(const char *ip, const int port)
 {
     main_reactor_ = make_unique<EventLoop>();
     acceptor_ = make_unique<Acceptor>(main_reactor_.get(), ip, port);
@@ -37,37 +37,46 @@ void TcpServer::Start()
         function<void()> sub_loop = [&sub_reactor] {sub_reactor->loop(); };
         thread_pool_->en_que(std::move(sub_loop));
     }
-    std::cout << "Server Start !!!" << std::endl;
+    print_if(1, "Main reactor loop");
     main_reactor_->loop();
 }
 
 void TcpServer::handle_new_connection(int fd)
 {
+    static int next_conn_id_ = 1;
     assert(fd != -1);
-    cout << "New connection fd: " << fd << endl;
+    //cout << "New connection fd: " << fd << endl;
     uint64_t random = fd % sub_reactors_.size();
 
-    TcpConnection *conn = new TcpConnection(sub_reactors_[random].get(), fd, next_conn_id_);
-    function<void(int)> cb = [this](int fd) {handle_close(fd); };
+    shared_ptr<TcpConnection> conn = make_shared<TcpConnection>(sub_reactors_[random].get(), fd, next_conn_id_);
 
-    conn->set_close_callback(cb);
+    conn->set_connect_callback(on_connect_);
+    conn->set_close_callback([this](const shared_ptr<TcpConnection> &conn) {handle_close(conn); });
     conn->set_message_callback(on_message_);
-    connectionsMap_[fd] = conn;
+
+    {
+        lock_guard<mutex> lock(mut_);
+        connectionsMap_[fd] = conn;
+    }
 
     // 分配id
     ++next_conn_id_;
     if (next_conn_id_ == 1000) 
         next_conn_id_ = 1;
+    conn->establish_connection();
 }
 
-void TcpServer::handle_close(int fd)
+void TcpServer::handle_close(const shared_ptr<TcpConnection> &conn)
 {
+    int fd = conn->fd();
     auto it = connectionsMap_.find(fd);
     assert(it != connectionsMap_.end());
-    TcpConnection *conn = connectionsMap_[fd];
-    connectionsMap_.erase(fd);
-    ::close(fd);
-    cout << "Close " << conn->id() << " connection!!! " << endl;
-    conn = nullptr;
+    {
+        lock_guard<mutex> lock(mut_);
+        connectionsMap_.erase(connectionsMap_.find(fd));
+    }
+
+    EventLoop *loop = conn->loop();
+    loop->add_one_func([conn] {conn->delete_connection(); });
 }
 

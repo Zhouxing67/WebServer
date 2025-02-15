@@ -4,7 +4,6 @@
 #include "Epoller.h"
 #include "Util.h"
 
-epoll_event Epoller::events[MAX_EVENTS];
 
 void set_ev(epoll_event &ev, epoll_data_t  data, int events)
 {
@@ -15,6 +14,7 @@ void set_ev(epoll_event &ev, epoll_data_t  data, int events)
 
 Epoller::Epoller()
 {
+    events_ = new epoll_event[MAX_EVENTS];
     errif(-1 == (epfd_ = epoll_create1(0)), "epoll create error");
 }
 
@@ -51,15 +51,15 @@ void Epoller::delete_channel(Channel *chl)
 
 vector<Channel *> Epoller::poll(int timeout)
 {
-    bzero(events, sizeof(events));
-    int nfds = epoll_wait(epfd_, events, MAX_EVENTS, timeout);
+    bzero(events_, sizeof(events_));
+    int nfds = epoll_wait(epfd_, events_, MAX_EVENTS, timeout);
     errif(nfds == -1, "epoll_wait error");
     
     vector<Channel *> activeChannels(nfds, nullptr);
     for (int i = 0; i < nfds; i++)
     {
-        Channel *activeCahnnel = static_cast<Channel *>(events[i].data.ptr);
-        activeCahnnel->set_ready_events(events[i].events);
+        Channel *activeCahnnel = static_cast<Channel *>(events_[i].data.ptr);
+        activeCahnnel->set_ready_events(events_[i].events);
         activeChannels[i] = activeCahnnel;
     }
     return activeChannels;

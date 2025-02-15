@@ -10,23 +10,24 @@ fd与其对应的channel通过epoll_ctl注册到内核中的epoll实例里，其
 #include <cstdint>
 #include <sys/epoll.h>
 #include <unistd.h>
+#include <memory>
 #include "EventLoop.h"
 #include "common.h"
 using std::function;
+using std::shared_ptr;
+using std::weak_ptr;
 
 class Channel {
 public:
     DISALLOW_COPY_AND_MOV(Channel);
     Channel(int fd, EventLoop *loop) : fd_(fd), loop_(loop) { }
-    ~Channel()
-    {
-        if (fd_ != -1) {
-            ::close(fd_);
-            fd_ = -1;
-        }
-    }
+    ~Channel() { }
 
     void handle_event() const; // 处理事件
+
+
+    void Tie(const shared_ptr<void> &obj); // 绑定
+
     void enable_read();  // 允许读
     void enable_write(); // 允许写
     void enable_ET(); // 以ET形式触发
@@ -43,8 +44,10 @@ public:
     void set_write_callback(std::function<void()> const &callback) { write_callback_ = callback; }
 
 private:
-    int fd_;
-    EventLoop *loop_;
+    int fd_ = -1;
+    EventLoop *loop_ = nullptr;
+    weak_ptr<void> tie_; // 用于绑定任何我们自定义的类型
+    bool tied_ = false; // 是否绑定
 
     //监听的事件
     short listen_events_ = 0;
@@ -53,7 +56,11 @@ private:
     function<void()> read_callback_;
     function<void()> write_callback_;
 
+    void handle_event_with_guard() const;
+    void handle_event_without_guard() const;
+
     bool is_read_event() const { return ready_events_ & (EPOLLIN | EPOLLPRI | EPOLLRDHUP); }
     bool is_write_event() const { return ready_events_ & (EPOLLOUT); }
 };
+
 #endif
