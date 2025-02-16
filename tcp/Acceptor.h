@@ -31,7 +31,8 @@ public:
     Acceptor() = default;
     ~Acceptor();
 
-    void set_new_conn_callback(const function<void(int)> &cb) { new_conn_callback_ = cb; }
+    void set_new_conn_callback(const function<void(int)> &fn) { new_conn_callback_ = fn; }
+    void set_new_conn_callback(function<void(int)> &&fn) { new_conn_callback_ = std::move(fn); }
     void accept_connection();
     void Create();
     void Bind(const char *ip, const int port);

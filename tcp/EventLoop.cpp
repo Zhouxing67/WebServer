@@ -14,7 +14,7 @@ EventLoop::EventLoop()
     poller_ = std::make_unique<Epoller>();
 }
 
-EventLoop::~EventLoop(){ }
+EventLoop::~EventLoop() { }
 
 void EventLoop::update_channel(Channel *chl) const
 {
@@ -32,6 +32,14 @@ void EventLoop::add_one_func(function<void()> fn)
     todolist_.emplace_back(std::move(fn));
 }
 
+void EventLoop::run_one_func(function<void()> fn)
+{
+    if (is_in_loop_thread())
+        fn();
+    else
+        add_one_func(std::move(fn));
+}
+
 void EventLoop::do_todolist()
 {
     vector<function<void()>> list;
@@ -39,17 +47,17 @@ void EventLoop::do_todolist()
         lock_guard<mutex> lock(mut_);
         list.swap(todolist_);
     }
-    for(auto &fn : list)
+    for (auto &fn : list)
         fn();
 }
 
 //每次事件循环，获取被触发的channel列表，让每一个活动channel处理自己的事件
-void EventLoop::loop() 
+void EventLoop::loop()
 {
+    tid_ = CurrentThread::tid();
     while (true) {
-        auto activeChannels = poller_->poll();
-        for (auto channel : activeChannels)
+        for (auto channel : poller_->poll())
             channel->handle_event();
+        do_todolist();
     }
-    do_todolist();
 }

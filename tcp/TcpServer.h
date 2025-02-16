@@ -35,6 +35,7 @@ public:
     void set_message_callback(TcpConnectionCallbcak fn) { on_message_ = std::move(fn); }
     
     void handle_close(const shared_ptr<TcpConnection> &conn);
+    void handle_close_in_loop(const shared_ptr<TcpConnection> &conn);
     void handle_new_connection(int fd);
 
 private:

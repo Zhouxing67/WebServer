@@ -30,7 +30,7 @@ public:
 
     void enable_read();  // 允许读
     void enable_write(); // 允许写
-    void enable_ET(); // 以ET形式触发
+    void enable_ET();    // 以ET形式触发
     void disable_write() { }
 
     int fd() const { return fd_; }
@@ -40,8 +40,12 @@ public:
 
     void set_InEpoll(bool in = true) { in_epoll_ = in; }
     void set_ready_events(int ev) { ready_events_ = ev; }
-    void set_read_callback(std::function<void()> const &callback) { read_callback_ = callback; }
-    void set_write_callback(std::function<void()> const &callback) { write_callback_ = callback; }
+
+    void set_read_callback(const function<void()>  &fn) { read_callback_ = fn; }
+    void set_read_callback(function<void()> &&fn) { read_callback_ = std::move(fn); }
+    
+    void set_write_callback(const function<void()>  &fn) { write_callback_ = fn; }
+    void set_write_callback(function<void()> &&fn) { write_callback_ = std::move(fn); }
 
 private:
     int fd_ = -1;

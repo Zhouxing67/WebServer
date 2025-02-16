@@ -1,29 +1,5 @@
-#include "tcp/Acceptor.h"
-#include "tcp/EventLoop.h"
-#include "tcp/TcpServer.h"
-#include "tcp/Buffer.h"
-#include "tcp/ThreadPool.h"
-#include "tcp/TcpConnection.h"
-#include "tcp/CurrentThread.h"
-#include <iostream>
-#include <functional>
-#include <arpa/inet.h>
-#include <vector>
-
-class EchoServer {
-public:
-    EchoServer(EventLoop *loop, const char *ip, const int port);
-    ~EchoServer();
-
-    void start();
-    void onConnection(const std::shared_ptr<TcpConnection> &conn);
-    void onMessage(const std::shared_ptr<TcpConnection> &conn);
-
-private:
-    TcpServer server_;
-};
-
-EchoServer::EchoServer(EventLoop *loop, const char *ip, const int port) : server_(loop, ip, port)
+#include "echo_server.h"
+EchoServer::EchoServer(const char *ip, const int port) : server_(ip, port)
 {
     server_.set_connection_callback(std::bind(&EchoServer::onConnection, this, std::placeholders::_1));
     server_.set_message_callback(std::bind(&EchoServer::onMessage, this, std::placeholders::_1));
@@ -58,14 +34,4 @@ void EchoServer::onMessage(const std::shared_ptr<TcpConnection> &conn)
         conn->Send(conn->Rbuf_data());
         conn->handle_close();
     }
-}
-
-int main(int argc, char *argv[])
-{
-    EventLoop *loop = new EventLoop();
-    EchoServer *server = new EchoServer(loop, "127.0.0.1", 8888);
-    server->start();
-    // delete loop;
-    // delete server;
-    return 0;
 }

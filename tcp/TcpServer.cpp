@@ -16,9 +16,9 @@ using std::endl;
 TcpServer::TcpServer(const char *ip, const int port)
 {
     main_reactor_ = make_unique<EventLoop>();
+
     acceptor_ = make_unique<Acceptor>(main_reactor_.get(), ip, port);
-    function<void(int)> cb = [this](int fd) {handle_new_connection(fd); };
-    acceptor_->set_new_conn_callback(cb);
+    acceptor_->set_new_conn_callback([this](int fd) {handle_new_connection(fd); });
 
     unsigned int size = thread::hardware_concurrency();
     thread_pool_ = make_unique<ThreadPool>(size);
@@ -33,21 +33,20 @@ TcpServer::~TcpServer() { }
 
 void TcpServer::Start()
 {
-    for (auto &sub_reactor: sub_reactors_) {
-        function<void()> sub_loop = [&sub_reactor] {sub_reactor->loop(); };
-        thread_pool_->en_que(std::move(sub_loop));
-    }
+    for (auto &sub_reactor : sub_reactors_)
+        thread_pool_->en_que([&sub_reactor] {sub_reactor->loop(); });
+
     print_if(1, "Main reactor loop");
     main_reactor_->loop();
 }
 
 void TcpServer::handle_new_connection(int fd)
 {
-    static int next_conn_id_ = 1;
     assert(fd != -1);
+    static int next_conn_id_ = 1;
+
     //cout << "New connection fd: " << fd << endl;
     uint64_t random = fd % sub_reactors_.size();
-
     shared_ptr<TcpConnection> conn = make_shared<TcpConnection>(sub_reactors_[random].get(), fd, next_conn_id_);
 
     conn->set_connect_callback(on_connect_);
@@ -56,26 +55,31 @@ void TcpServer::handle_new_connection(int fd)
 
     {
         lock_guard<mutex> lock(mut_);
-        connectionsMap_[fd] = conn;
     }
+    connectionsMap_[fd] = conn;
 
     // 分配id
     ++next_conn_id_;
-    if (next_conn_id_ == 1000) 
+    if (next_conn_id_ == 1000)
         next_conn_id_ = 1;
     conn->establish_connection();
 }
 
 void TcpServer::handle_close(const shared_ptr<TcpConnection> &conn)
 {
+    //由main_reactor_来执行`HandleCloseInLoop`函数，来保证线程安全
+    //此时main_reactor_负责既负责新建连接，又负责关闭连接
+    main_reactor_->run_one_func([this, conn] {handle_close_in_loop(conn); });
+}
+
+void TcpServer::handle_close_in_loop(const shared_ptr<TcpConnection> &conn)
+{
+    cout << "Close connection "<<conn->id()  << " Current thread id: " << CurrentThread::tid() << endl;
     int fd = conn->fd();
     auto it = connectionsMap_.find(fd);
     assert(it != connectionsMap_.end());
-    {
-        lock_guard<mutex> lock(mut_);
-        connectionsMap_.erase(connectionsMap_.find(fd));
-    }
 
+    connectionsMap_.erase(connectionsMap_.find(fd));
     EventLoop *loop = conn->loop();
     loop->add_one_func([conn] {conn->delete_connection(); });
 }

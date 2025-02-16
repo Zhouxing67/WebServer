@@ -53,8 +53,12 @@ vector<Channel *> Epoller::poll(int timeout)
 {
     bzero(events_, sizeof(events_));
     int nfds = epoll_wait(epfd_, events_, MAX_EVENTS, timeout);
-    errif(nfds == -1, "epoll_wait error");
-    
+    if (nfds == -1)
+        if(errno != EINTR)
+            errif(1, "epoll wait error");
+        else
+            return vector<Channel *>();
+
     vector<Channel *> activeChannels(nfds, nullptr);
     for (int i = 0; i < nfds; i++)
     {
