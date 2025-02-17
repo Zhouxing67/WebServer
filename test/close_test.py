@@ -2,6 +2,7 @@ import socket
 import threading
 import time
 import traceback
+import sys
 
 
 def connect_and_close():
@@ -15,10 +16,16 @@ def connect_and_close():
         traceback.print_exc()  # 打印失败原因
 
 
-Threads = 1
-# 创建并启动100个线程
-threads = [threading.Thread(target=connect_and_close) for _ in range(Threads)]
-for t in threads:
-    t.start()
-for t in threads:
-    t.join()
+def start():
+    if len(sys.argv) > 1:
+        concurrent = int(sys.argv[1])
+    else:
+        concurrent = 16
+    threads = [threading.Thread(target=connect_and_close) for _ in range(concurrent)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+
+
+start()

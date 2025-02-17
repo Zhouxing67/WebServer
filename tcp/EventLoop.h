@@ -33,9 +33,17 @@ private:
     unique_ptr<Epoller> poller_;
     vector<function<void()>> todolist_;
     mutex mut_;
-    pid_t tid_ ; //执行EventLoop::loop的线程id
 
-    //是否正在执行loop函数
+    //执行EventLoop::loop的线程id（所有的EventLoop都由主线程创建，但sub_reactor的EventLoop::loop的调用会被分配到子线程）
+    pid_t tid_;
+
+    int wakeup_fd_;
+    unique_ptr<Channel> wakeup_channel_;
+
+    bool is_doing_todolist_ = false;
+
+    void wakeup();//向wakeup_fd_写一个字节，唤醒loop
+    // 判断调用该函数的是不是调用EventLoop::loop的线程。
     bool is_in_loop_thread() const { return tid_ == CurrentThread::tid(); }
     void do_todolist();
 };
