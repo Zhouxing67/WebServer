@@ -74,7 +74,7 @@ void TcpServer::handle_close(const shared_ptr<TcpConnection> &conn)
 
 void TcpServer::handle_close_in_loop(const shared_ptr<TcpConnection> &conn)
 {
-    cout << "Close connection "<<conn->id()  << " Current thread id: " << CurrentThread::tid() << endl;
+    cout << "Close connection "<<conn->id() << endl;
     int fd = conn->fd();
     auto it = connectionsMap_.find(fd);
     assert(it != connectionsMap_.end());

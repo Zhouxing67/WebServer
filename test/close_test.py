@@ -9,7 +9,8 @@ def connect_and_close():
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect(("localhost", 8888))
-        time.sleep(10)  # 等待10s,模拟业务处理
+        s.send("Hello server!!!".encode())
+        time.sleep(3)  # 等待10s,模拟业务处理
         s.close()
     except Exception:
         print("连接或通信失败！")
@@ -21,7 +22,8 @@ def start():
         concurrent = int(sys.argv[1])
     else:
         concurrent = 16
-    threads = [threading.Thread(target=connect_and_close) for _ in range(concurrent)]
+    threads = [threading.Thread(target=connect_and_close)
+               for _ in range(concurrent)]
     for t in threads:
         t.start()
     for t in threads:

@@ -2,7 +2,7 @@
 
 ThreadPool::ThreadPool(unsigned int concurrency)
 {
-    for (int i = 0; i < concurrency; i++) {
+    for (unsigned int i = 0; i < concurrency; i++) {
         threads_.emplace_back(thread([this] {
             while (true) {
                 function<void()> task;

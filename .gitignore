@@ -35,3 +35,6 @@ server
 
 zother
 bin/*
+bin
+build/*
+build

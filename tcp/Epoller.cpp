@@ -53,15 +53,15 @@ vector<Channel *> Epoller::poll(int timeout)
 {
     bzero(events_, sizeof(events_));
     int nfds = epoll_wait(epfd_, events_, MAX_EVENTS, timeout);
-    if (nfds == -1)
-        if(errno != EINTR)
+    if (nfds == -1) {
+        if (errno != EINTR)
             errif(1, "epoll wait error");
         else
             return vector<Channel *>();
+    }
 
     vector<Channel *> activeChannels(nfds, nullptr);
-    for (int i = 0; i < nfds; i++)
-    {
+    for (int i = 0; i < nfds; i++) {
         Channel *activeCahnnel = static_cast<Channel *>(events_[i].data.ptr);
         activeCahnnel->set_ready_events(events_[i].events);
         activeChannels[i] = activeCahnnel;
