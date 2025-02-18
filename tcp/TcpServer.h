@@ -21,7 +21,8 @@ using std::shared_ptr;
 class Channel;
 class ThreadPool;
 class Acceptor;
-using TcpConnectionCallbcak = TcpConnection::TcpConnectionCallback; 
+class EventLoopThreadPool;
+using TcpConnectionCallbcak = TcpConnection::TcpConnectionCallback;
 
 class TcpServer
 {
@@ -39,16 +40,25 @@ public:
     void handle_new_connection(int fd);
 
 private:
-    unique_ptr<EventLoop> main_reactor_;
+    EventLoop* main_reactor_ = nullptr;
     
     unique_ptr<Acceptor> acceptor_;
     vector<unique_ptr<EventLoop>> sub_reactors_;
     unordered_map<int, shared_ptr<TcpConnection>>connectionsMap_;
-    unique_ptr<ThreadPool> thread_pool_;
+    unique_ptr<EventLoopThreadPool> thread_pool_;
 
     TcpConnectionCallbcak on_message_;
     TcpConnectionCallbcak on_connect_;
     mutex mut_;
+
+    //生成TcpConnection连接id
+    int get_conn_id()
+    {
+        static int id = 0;
+        if(id == 1000)
+            id = 0;
+        return id++;
+    }
 
 };
 

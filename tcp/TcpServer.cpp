@@ -2,40 +2,37 @@
 #include <iostream>
 #include <assert.h>
 
+#include "EventLoopThreadPool.h"
 #include "TcpServer.h"
 #include "TcpConnection.h"
 #include "EventLoop.h"
 #include "Acceptor.h"
-#include "ThreadPool.h"
 #include "common.h"
 
 using std::make_unique;
+using std::make_shared;
 using std::cout;
 using std::endl;
 
 TcpServer::TcpServer(const char *ip, const int port)
 {
-    main_reactor_ = make_unique<EventLoop>();
+    main_reactor_ = new EventLoop();
 
-    acceptor_ = make_unique<Acceptor>(main_reactor_.get(), ip, port);
+    acceptor_ = make_unique<Acceptor>(main_reactor_, ip, port);
     acceptor_->set_new_conn_callback([this](int fd) {handle_new_connection(fd); });
 
-    unsigned int size = thread::hardware_concurrency();
-    thread_pool_ = make_unique<ThreadPool>(size);
-
-    for (size_t i = 0; i < size; ++i) {
-        unique_ptr<EventLoop> sub_reactor = make_unique<EventLoop>();
-        sub_reactors_.push_back(std::move(sub_reactor));
-    }
+    thread_pool_ = make_unique<EventLoopThreadPool>(main_reactor_);
 }
 
-TcpServer::~TcpServer() { }
+TcpServer::~TcpServer()
+{
+    delete main_reactor_;
+    main_reactor_ = nullptr;
+}
 
 void TcpServer::Start()
 {
-    for (auto &sub_reactor : sub_reactors_)
-        thread_pool_->en_que([&sub_reactor] {sub_reactor->loop(); });
-
+    thread_pool_->start();
     print_if(1, "Main reactor loop");
     main_reactor_->loop();
 }
@@ -43,25 +40,16 @@ void TcpServer::Start()
 void TcpServer::handle_new_connection(int fd)
 {
     assert(fd != -1);
-    static int next_conn_id_ = 1;
+    int next_conn_id_ = get_conn_id();
 
     //cout << "New connection fd: " << fd << endl;
-    uint64_t random = fd % sub_reactors_.size();
-    shared_ptr<TcpConnection> conn = make_shared<TcpConnection>(sub_reactors_[random].get(), fd, next_conn_id_);
+    EventLoop *sub_reactors_ = thread_pool_->get_next_loop();
+    shared_ptr<TcpConnection> conn = make_shared<TcpConnection>(sub_reactors_, fd, next_conn_id_);
 
     conn->set_connect_callback(on_connect_);
     conn->set_close_callback([this](const shared_ptr<TcpConnection> &conn) {handle_close(conn); });
     conn->set_message_callback(on_message_);
-
-    {
-        lock_guard<mutex> lock(mut_);
-    }
     connectionsMap_[fd] = conn;
-
-    // 分配id
-    ++next_conn_id_;
-    if (next_conn_id_ == 1000)
-        next_conn_id_ = 1;
     conn->establish_connection();
 }
 
