@@ -32,7 +32,9 @@ public:
     ~TcpServer();
 
     void Start();
+    //设置建立连接时的业务逻辑
     void set_connection_callback(TcpConnectionCallbcak fn) { on_connect_ = std::move(fn); }
+    //设置连接的业务逻辑
     void set_message_callback(TcpConnectionCallbcak fn) { on_message_ = std::move(fn); }
     
     void handle_close(const shared_ptr<TcpConnection> &conn);
@@ -49,7 +51,6 @@ private:
 
     TcpConnectionCallbcak on_message_;
     TcpConnectionCallbcak on_connect_;
-    mutex mut_;
 
     //生成TcpConnection连接id
     int get_conn_id()

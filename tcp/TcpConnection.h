@@ -76,9 +76,7 @@ private:
     TcpConnectionCallback on_connect_;
 
     void ReadNonBlocking();
-    void ReadBLocking();
     void WriteNonBlocking();
-    void WriteBlocking();
 };
 
 #endif

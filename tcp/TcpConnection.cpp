@@ -31,17 +31,6 @@ TcpConnection::~TcpConnection()
     ::close(connfd_);
 }
 
-void TcpConnection::Send(const std::string &msg)
-{
-    set_send_buf(msg.c_str());
-    Write();
-}
-
-void TcpConnection::Send(const char *msg)
-{
-    set_send_buf(msg);
-    Write();
-}
 
 void TcpConnection::handle_message()
 {
@@ -72,6 +61,18 @@ void TcpConnection::establish_connection()
 void TcpConnection::delete_connection()
 {
     loop_->delete_channel(channel_.get());
+}
+
+void TcpConnection::Send(const std::string &msg)
+{
+    set_send_buf(msg.c_str());
+    Write();
+}
+
+void TcpConnection::Send(const char *msg)
+{
+    set_send_buf(msg);
+    Write();
 }
 
 void TcpConnection::Read()
