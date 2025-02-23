@@ -1,7 +1,8 @@
 #include "Channel.h"
 #include "Epoller.h"
-#include "EventLoop.h"
 #include "Util.h"
+#include "TimerQueue.h"
+#include "EventLoop.h"
 #include <string.h> 
 #include <iostream>
 #include <mutex>
@@ -27,7 +28,7 @@ EventLoop::EventLoop()
         });
 
     wakeup_channel_->enable_read();
-
+    timerQue_ = make_unique<TimerQueue>(this);
 }
 
 EventLoop::~EventLoop() { }
@@ -59,6 +60,21 @@ void EventLoop::run_one_func(function<void()> fn)
         fn();
     else
         add_one_func(std::move(fn));
+}
+
+void EventLoop::run_at(TimeStamp timestamp, std::function<void()> cb)
+{
+    timerQue_->add_Timer(timestamp, cb, -1.0);
+}
+
+void EventLoop::run_after(Second wait_time, std::function<void()> cb)
+{
+    timerQue_->add_Timer(TimeStamp::Now() + wait_time, cb, -1.0);
+}
+
+void EventLoop::run_every(Second interval, std::function<void()> cb)
+{
+    timerQue_->add_Timer(TimeStamp::Now() + interval, cb, interval);
 }
 
 void EventLoop::wakeup()
