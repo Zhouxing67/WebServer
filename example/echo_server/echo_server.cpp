@@ -6,6 +6,11 @@ EchoServer::EchoServer(const char *ip, const int port) : server_(ip, port)
 };
 EchoServer::~EchoServer() { };
 
+void EchoServer::set_active_time(Second second)
+{
+    server_.set_active_time(second);
+}
+
 void EchoServer::start()
 {
     server_.Start();

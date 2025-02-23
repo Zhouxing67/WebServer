@@ -30,7 +30,9 @@ public:
     TcpConnection(EventLoop *loop, int connfd, int connid);
     ~TcpConnection();
 
-    
+    TimeStamp timestamp() const { return timestamp_; }
+    void update_TimeStamp(TimeStamp time = TimeStamp::Now()) { timestamp_ = time; }
+
     void set_connect_callback(TcpConnectionCallback fn) { on_connect_ = fn; } // 连接建立时的回调函数
     void set_close_callback(TcpConnectionCallback fn) { on_close_ = fn; } // 关闭时的回调函数
     void set_message_callback(TcpConnectionCallback fn) { on_message_ = fn; } // 接受到信息的回调函数  
@@ -63,7 +65,8 @@ private:
     
     int connfd_; // 该连接绑定的Socket
     int connid_; // 该连接的id
-    
+
+    TimeStamp timestamp_ = TimeStamp::Now();
     ConnectionState state_; // 连接状态
     EventLoop *loop_; // 该连接所属的EventLoop
 

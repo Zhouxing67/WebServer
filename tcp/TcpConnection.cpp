@@ -20,7 +20,11 @@ TcpConnection::TcpConnection(EventLoop *loop, int connfd, int connid) : connfd_(
     if (loop != nullptr) {
         channel_ = std::make_unique<Channel>(connfd, loop);
         channel_->enable_ET();
-        channel_->set_read_callback([this] {this->handle_message(); });
+        channel_->set_read_callback([this]
+            {
+                update_TimeStamp();
+                handle_message();
+            });
     }
     read_buf_ = std::make_unique<Buffer>();
     send_buf_ = std::make_unique<Buffer>();
@@ -68,6 +72,9 @@ void TcpConnection::Send(const std::string &msg)
     set_send_buf(msg.c_str());
     Write();
 }
+
+void TcpConnection::Send(const char *msg, int len)
+{ }
 
 void TcpConnection::Send(const char *msg)
 {

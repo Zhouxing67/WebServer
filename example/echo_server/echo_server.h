@@ -12,6 +12,7 @@ public:
     EchoServer(const char *ip, const int port);
     ~EchoServer();
 
+    void set_active_time(Second second);
     void start();
     void onConnection(const std::shared_ptr<TcpConnection> &conn);
     void onMessage(const std::shared_ptr<TcpConnection> &conn);

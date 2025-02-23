@@ -22,7 +22,6 @@ void read_timerfd(TimeStamp now, int timerfd)
 {
     uint64_t howmany;
     int n = ::read(timerfd, &howmany, sizeof(howmany));
-    std::cout << "TimerQueue::handleRead() " << howmany << " at " << now.toString();
     if (n != sizeof howmany) {
         throw std::runtime_error("TimerQueue::handleRead() does`t read 8 bytes");
     }

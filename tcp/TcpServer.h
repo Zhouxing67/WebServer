@@ -9,6 +9,7 @@
 #include "common.h"
 #include "EventLoop.h"
 #include "TcpConnection.h"
+
 using std::unordered_map;
 using std::vector;
 using std::random_device;
@@ -16,6 +17,7 @@ using std::uniform_int_distribution;
 using std::function;
 using std::unique_ptr;
 using std::shared_ptr;
+using std::weak_ptr;
 
 
 class Channel;
@@ -32,18 +34,22 @@ public:
     ~TcpServer();
 
     void Start();
+
+    void set_active_time(Second second = 30.0) { active_time_ = second; }
     //设置建立连接时的业务逻辑
     void set_connection_callback(TcpConnectionCallbcak fn) { on_connect_ = std::move(fn); }
     //设置连接的业务逻辑
     void set_message_callback(TcpConnectionCallbcak fn) { on_message_ = std::move(fn); }
-    
+
+    void handle_shutdown( weak_ptr<TcpConnection> &conn);
     void handle_close(const shared_ptr<TcpConnection> &conn);
     void handle_close_in_loop(const shared_ptr<TcpConnection> &conn);
     void handle_new_connection(int fd);
 
 private:
-    EventLoop* main_reactor_ = nullptr;
-    
+    EventLoop *main_reactor_ = nullptr;
+    Second active_time_ = -1.0;
+
     unique_ptr<Acceptor> acceptor_;
     vector<unique_ptr<EventLoop>> sub_reactors_;
     unordered_map<int, shared_ptr<TcpConnection>>connectionsMap_;
