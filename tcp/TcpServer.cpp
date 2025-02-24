@@ -21,7 +21,7 @@ TcpServer::TcpServer(const char *ip, const int port)
 
     acceptor_ = make_unique<Acceptor>(main_reactor_, ip, port);
     acceptor_->set_new_conn_callback([this](int fd) { handle_new_connection(fd); });
-
+    
     thread_pool_ = make_unique<EventLoopThreadPool>(main_reactor_);
 }
 
