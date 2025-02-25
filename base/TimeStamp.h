@@ -3,12 +3,15 @@
 
 #include <ctime>
 #include <string>
+#include <utility>
 
 using std::string;
+
 
 typedef double Second; 
 typedef uint64_t MicroSecond;
 typedef uint64_t NanoSecond;
+typedef std::pair<time_t, MicroSecond> UnixSecond_And_MicroSecond;
 
 //Time stamp in UTC, in microseconds resolution.
 class TimeStamp
@@ -33,6 +36,10 @@ public:
     MicroSecond microSecondsSinceEpoch() const { return microSecondsSinceEpoch_; }
     time_t UnixSecondsSinceEpoch() const { return static_cast<time_t>(microSecondsSinceEpoch_ / kMicroSecondsPerSecond); }
     Second secondsSinceEpoch() const { return static_cast<Second>(microSecondsSinceEpoch_ / kMicroSecondsPerSecond); }
+    UnixSecond_And_MicroSecond UnixSecondandMicroSecond()
+    {
+        return { UnixSecondsSinceEpoch(), microSecondsSinceEpoch() % kMicroSecondsPerSecond };
+    }
 
     bool isvalid() const { return microSecondsSinceEpoch_ > 0; }
 

@@ -39,3 +39,4 @@ bin
 build/*
 build
 tmp
+.cache
