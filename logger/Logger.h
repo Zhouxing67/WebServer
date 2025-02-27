@@ -8,12 +8,12 @@
 using std::unique_ptr;
 
 using OutputFunc = void (*)(const char *, int); // 输出操作
-using FlushFunc = void (*)(); //刷新操作
+using FlushFunc = void (*)();                   //刷新操作
 
 class LoggerImpl;
 class LogStream;
 
-enum class LogLevel
+enum class LOG_LEVEL
 {
     DEBUG,
     INFO,
@@ -25,13 +25,13 @@ enum class LogLevel
 class Logger
 {
   public:
-    Logger(const char *file, int line, LogLevel level);
+    Logger(const char *file, int line, LOG_LEVEL level);
     ~Logger();
 
     LogStream &stream();
 
-    static LogLevel LEVEL();
-    static void SET_LEVEL(LogLevel level);
+    static LOG_LEVEL LEVEL();
+    static void SET_LEVEL(LOG_LEVEL level);
     static void setOutput(OutputFunc); // 默认fwrite到stdout
     static void setFlush(FlushFunc);   // 默认fflush到stdout
 
@@ -40,15 +40,15 @@ class Logger
 };
 
 #define LOG_DEBUG                                                                                                      \
-    if (Logger::LEVEL() <= LogLevel::DEBUG)                                                                            \
-    Logger(__FILE__, __LINE__, LogLevel::DEBUG).stream()
+    if (Logger::LEVEL() <= LOG_LEVEL::DEBUG)                                                                            \
+    Logger(__FILE__, __LINE__, LOG_LEVEL::DEBUG).stream()
 
 #define LOG_INFO                                                                                                       \
-    if (Logger::LEVEL() <= LogLevel::INFO)                                                                             \
-    Logger(__FILE__, __LINE__, LogLevel::INFO).stream()
+    if (Logger::LEVEL() <= LOG_LEVEL::INFO)                                                                             \
+    Logger(__FILE__, __LINE__, LOG_LEVEL::INFO).stream()
 
-#define LOG_WARN  Logger(__FILE__, __LINE__, LogLevel::WARN).stream()
-#define LOG_ERROR Logger(__FILE__, __LINE__, LogLevel::ERROR).stream()
-#define LOG_FATAL Logger(__FILE__, __LINE__, LogLevel::FATAL).stream()
+#define LOG_WARN  Logger(__FILE__, __LINE__, LOG_LEVEL::WARN).stream()
+#define LOG_ERROR Logger(__FILE__, __LINE__, LOG_LEVEL::ERROR).stream()
+#define LOG_FATAL Logger(__FILE__, __LINE__, LOG_LEVEL::FATAL).stream()
 
 #endif

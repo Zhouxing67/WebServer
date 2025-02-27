@@ -15,7 +15,6 @@ __thread time_t t_last_second = 0;
 
 namespace
 {
-
     struct Template
     {
         Template(const char *str, unsigned size) : str_(str), size_(size) {}
@@ -40,9 +39,9 @@ namespace
     }
     OutputFunc global_output = defaultOutput;
     FlushFunc global_flush = defaultFlush;
-    LogLevel global_level =
+    LOG_LEVEL global_level =
 #ifdef _DEBUG
-        LogLevel::DEBUG;
+        LOG_LEVEL::DEBUG;
 #else
         LogLevel::INFO;
 #endif
@@ -54,20 +53,20 @@ namespace
 
     const char *FINISH = "\033[0m";
 
-    std::unordered_map<LogLevel, const char *> Level_map_ANSI{{LogLevel::DEBUG, GREEN},
-                                                              {LogLevel::INFO, BLUE},
-                                                              {LogLevel::WARN, ORANGE},
-                                                              {LogLevel::ERROR, RED},
-                                                              {LogLevel::FATAL, FATAL_RED}};
+    std::unordered_map<LOG_LEVEL, const char *> Level_map_ANSI{{LOG_LEVEL::DEBUG, GREEN},
+                                                               {LOG_LEVEL::INFO, BLUE},
+                                                               {LOG_LEVEL::WARN, ORANGE},
+                                                               {LOG_LEVEL::ERROR, RED},
+                                                               {LOG_LEVEL::FATAL, FATAL_RED}};
 } // namespace
 
+LOG_LEVEL Logger::LEVEL() { return global_level; }
+void Logger::SET_LEVEL(LOG_LEVEL level) { global_level = level; }
 void Logger::setFlush(FlushFunc func) { global_flush = func; }
 void Logger::setOutput(OutputFunc func) { global_output = func; }
 
-LogLevel Logger::LEVEL() { return global_level; }
-void Logger::SET_LEVEL(LogLevel level) { global_level = level; }
 
-Logger::Logger(const char *file, int line, LogLevel level)
+Logger::Logger(const char *file, int line, LOG_LEVEL level)
 {
     impl_ = make_unique<LoggerImpl>(SourceFile(file), line, level);
 }
@@ -80,14 +79,14 @@ Logger::~Logger()
     global_output(buf.data(), size);
     global_flush();
 
-    if (impl_->level() == LogLevel::FATAL) {
+    if (impl_->level() == LOG_LEVEL::FATAL) {
         abort();
     }
 }
 
 LogStream &Logger::stream() { return impl_->stream(); }
 
-LoggerImpl::LoggerImpl(SourceFile source, int line, LogLevel level) : level_(level), file_(source), line_(line)
+LoggerImpl::LoggerImpl(SourceFile source, int line, LOG_LEVEL level) : level_(level), file_(source), line_(line)
 {
     stream_ << Level_map_ANSI[level_];
     FormattedTime();

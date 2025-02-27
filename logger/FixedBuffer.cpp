@@ -6,7 +6,7 @@ void FixedBuffer::append(const char *buf, int len)
     if (len < avail())
     {
         memcpy(cur_, buf, len);
-        bias(len);
+        cur_ += len;
     }
 }
 

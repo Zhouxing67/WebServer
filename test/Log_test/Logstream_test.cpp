@@ -1,8 +1,7 @@
 #include "Logger.h"
 int main()
 {
-    Logger::SET_LEVEL(LogLevel::DEBUG);
-
+    Logger::SET_LEVEL(LOG_LEVEL::DEBUG);
 
     LOG_DEBUG << "LOG_DEBUG";
     LOG_INFO << "LOG_INFO";

@@ -24,18 +24,13 @@ class FixedBuffer
     const char *data() const { return data_; }
     int size() const { return static_cast<int>(cur_ - data_); }
 
-    char *current() { return cur_; }
-    const char *end() const { return data_ + KFIXEDBUFFERSIZE; }
-    int avail() const { return end() - cur_; }
-
+    int avail() const { return data_ + KFIXEDBUFFERSIZE - cur_; }
     void reset() { cur_ = data_; }
     void clear() { bzero(data_, KFIXEDBUFFERSIZE); }
 
   private:
     char *data_;
     char *cur_ = nullptr;
-
-    void bias(int len) { cur_ += len; }
 };
 
 #endif

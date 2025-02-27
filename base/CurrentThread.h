@@ -10,20 +10,19 @@ namespace CurrentThread
     extern __thread char t_formattedTid[32];
     extern __thread int t_formattedTidLength;
 
-    void CacheTid();
-
+    inline const char *tidString() { return t_formattedTid; }
+    inline int tidStringLength() { return t_formattedTidLength; }
+    
     pid_t gettid();
-
+    void CacheTid();
     inline int tid()
     {
-        if (__builtin_expect(t_cachedTid == 0, 0)) {
+        if (__builtin_expect(t_cachedTid == 0, 0)) {//期望 (t_cacheTid == 0) 的结果未0
             CacheTid();
         }
         return t_cachedTid;
     }
+    
 
-
-    inline const char *tidString() { return t_formattedTid; }
-    inline int tidStringLength() { return t_formattedTidLength; }
 }
 #endif
