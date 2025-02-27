@@ -1,19 +1,17 @@
-#include <unistd.h>
-#include <iostream>
 #include <assert.h>
+#include <unistd.h>
 
-#include "EventLoopThreadPool.h"
-#include "TcpServer.h"
-#include "TcpConnection.h"
-#include "EventLoop.h"
 #include "Acceptor.h"
+#include "EventLoop.h"
+#include "EventLoopThreadPool.h"
+#include "Logger.h"
+#include "TcpConnection.h"
+#include "TcpServer.h"
 #include "common.h"
 
-using std::make_unique;
 using std::make_shared;
+using std::make_unique;
 
-using std::cout;
-using std::endl;
 
 TcpServer::TcpServer(const char *ip, const int port)
 {
@@ -21,7 +19,7 @@ TcpServer::TcpServer(const char *ip, const int port)
 
     acceptor_ = make_unique<Acceptor>(main_reactor_, ip, port);
     acceptor_->set_new_conn_callback([this](int fd) { handle_new_connection(fd); });
-    
+
     thread_pool_ = make_unique<EventLoopThreadPool>(main_reactor_);
 }
 
@@ -34,13 +32,8 @@ TcpServer::~TcpServer()
 void TcpServer::Start()
 {
     thread_pool_->start();
-    cout << TimeStamp::Now().toFormattedString(false) << endl;
-    main_reactor_->run_every(60.0, []
-        {
-            cout << "HELLO! 3-SECOND HAVE PASSED" << endl;
-        });
+    main_reactor_->run_every(15.0, [] { LOG_INFO << "HELLO! 15-SECOND HAVE PASSED"; });
     main_reactor_->loop();
-
 }
 
 void TcpServer::handle_new_connection(int fd)
@@ -48,14 +41,13 @@ void TcpServer::handle_new_connection(int fd)
     assert(fd != -1);
     int next_conn_id_ = get_conn_id();
 
-    //cout << "New connection fd: " << fd << endl;
+    // cout << "New connection fd: " << fd << endl;
     EventLoop *sub_reactors_ = thread_pool_->get_next_loop();
     shared_ptr<TcpConnection> conn = make_shared<TcpConnection>(sub_reactors_, fd, next_conn_id_);
-    sub_reactors_->run_after(active_time_, [this, conn]
-        {
-            weak_ptr<TcpConnection> weak_conn(conn);
-            handle_shutdown(weak_conn);
-        });
+    sub_reactors_->run_after(active_time_, [this, conn] {
+        weak_ptr<TcpConnection> weak_conn(conn);
+        handle_shutdown(weak_conn);
+    });
 
     conn->set_connect_callback(on_connect_);
     conn->set_message_callback(on_message_);
@@ -97,4 +89,3 @@ void TcpServer::handle_close_in_loop(const shared_ptr<TcpConnection> &conn)
     EventLoop *loop = conn->loop();
     loop->add_one_func([conn] { conn->delete_connection(); });
 }
-

@@ -1,7 +1,6 @@
 #include <memory>
 #include <unistd.h>
 #include <assert.h>
-#include <iostream>
 #include <sys/socket.h>
 #include <cstring>
 

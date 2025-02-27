@@ -1,11 +1,8 @@
 #include "Acceptor.h"
+#include "Logger.h"
 #include <cassert>
-#include <iostream>
 
 using std::make_unique;
-using std::cout;
-using std::endl;
-
 
 Acceptor::Acceptor(EventLoop *loop, const char *ip4, uint16_t port) : loop_(loop)
 {
@@ -38,7 +35,7 @@ void Acceptor::Create()
     assert(listenfd_ == -1);
     listenfd_ = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK | SOCK_CLOEXEC, IPPROTO_TCP);
     if (listenfd_ == -1) {
-        cout << "Failed to create socket" << endl;
+        LOG_ERROR << "Failed to create socket";
     }
 }
 
@@ -51,7 +48,7 @@ void Acceptor::Bind(const char *ip, const int port)
     addr.sin_port = htons(port);
 
     if (::bind(listenfd_, (struct sockaddr *)&addr, sizeof(addr)) == -1) {
-        cout << "Failed to Bind : " << ip << ":" << port << endl;
+        LOG_ERROR << "Failed to Bind : " << ip <<":" <<port ;
     }
 }
 
@@ -59,6 +56,6 @@ void Acceptor::Listen()
 {
     assert(listenfd_ != -1);
     if (::listen(listenfd_, SOMAXCONN) == -1) {
-        cout << "Failed to Listen" << endl;
+        LOG_ERROR << "Failed to Listen";
     }
 }

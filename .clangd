@@ -1,0 +1,35 @@
+# 最顶层包含几个主要部分：If, CompileFlags, Diagnostics, InlayHints, Completion, 和 SemanticTokens
+
+If:                               # 设置配置文件的使用条件
+  PathMatch: .*\.h                # 所有头文件都使用
+  PathExclude: include/llvm-c/.*  # 排除该路径下的所有文件
+
+Index:
+  Background: true            # 在后台索引项目代码
+
+
+Diagnostics:             # 诊断设置部分
+  ClangTidy:             # Clang-Tidy 配置
+    Add: [
+      #  "cppcoreguidelines-*",
+      #  "modernize-*",
+        "performance-*"
+        ] 
+    # 添加Clang-Tidy检查项, 其含义参见https://clang.llvm.org/extra/clang-tidy/
+    Remove: [
+        "clang-analyzer-*",
+        "modernize-use-trailing-return-type",
+        "cppcoreguidelines-macro-usage",
+        "modernize-use-nodiscard",
+        "cppcoreguidelines-special-member-functions"
+        ] # 移除Clang分析器检查项
+  UnusedIncludes: Strict
+
+InlayHints:              # 代码提示设置部分
+  Enabled: true          # 启用代码提示
+  ParameterNames: true   # 显示参数名称提示
+  DeducedTypes: true     # 显示推断类型提示
+  Designators: true      # 显示设计器提示
+
+Completion:              # 代码补全设置部分
+  AllScopes: true        # 启用所有作用域的代码补全

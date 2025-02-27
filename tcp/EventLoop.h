@@ -1,6 +1,7 @@
 #ifndef EVENT_LOOP_H
 #define EVENT_LOOP_H
 
+#include <functional>
 #include <sys/epoll.h>
 #include <vector>
 #include <memory>

@@ -13,6 +13,5 @@
     DISALLOW_COPY(cname)                 \
     DISALLOW_MOV(cname) 
 
-void print_if(bool cond, const char *msg);
 #endif
 

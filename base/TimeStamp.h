@@ -5,13 +5,13 @@
 #include <string>
 #include <utility>
 
+const int FORMAT_TIME_BUFSIZE  = 64;
 using std::string;
 
-
-typedef double Second; 
-typedef uint64_t MicroSecond;
-typedef uint64_t NanoSecond;
-typedef std::pair<time_t, MicroSecond> UnixSecond_And_MicroSecond;
+using Second = double; 
+using MicroSecond = uint64_t;
+using NanoSecond = uint64_t;
+using UnixSecond_And_MicroSecond = std::pair<time_t, MicroSecond>;
 
 //Time stamp in UTC, in microseconds resolution.
 class TimeStamp
@@ -32,6 +32,7 @@ public:
 
     string toString() const;
     string toFormattedString(bool showMicroseconds = true) const;
+    void toFormattedString(char *desc,bool showMicroseconds = true) const;
 
     MicroSecond microSecondsSinceEpoch() const { return microSecondsSinceEpoch_; }
     time_t UnixSecondsSinceEpoch() const { return static_cast<time_t>(microSecondsSinceEpoch_ / kMicroSecondsPerSecond); }
@@ -46,7 +47,7 @@ public:
     //now
     static TimeStamp Now();
     //返回一个无效的TimeStamp
-    static TimeStamp Invalid() { return TimeStamp(); }
+    static TimeStamp Invalid() { return {}; }
     //使用unix时间戳构造TimeStamp
     static TimeStamp fromUnixTime(time_t t) { return TimeStamp(static_cast<MicroSecond>(t * kMicroSecondsPerSecond)); };
     static TimeStamp fromUnixTime(time_t t, int microseconds) { return TimeStamp(static_cast<MicroSecond>(t * kMicroSecondsPerSecond + microseconds)); }
