@@ -32,7 +32,7 @@ public:
 
     string toString() const;
     string toFormattedString(bool showMicroseconds = true) const;
-    void toFormattedString(char *desc,bool showMicroseconds = true) const;
+    int toFormattedString(char *desc,bool showMicroseconds = true) const;
 
     MicroSecond microSecondsSinceEpoch() const { return microSecondsSinceEpoch_; }
     time_t UnixSecondsSinceEpoch() const { return static_cast<time_t>(microSecondsSinceEpoch_ / kMicroSecondsPerSecond); }

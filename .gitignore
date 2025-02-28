@@ -40,3 +40,4 @@ build/*
 build
 tmp
 .cache
+log

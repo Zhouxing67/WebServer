@@ -9,13 +9,13 @@ include_directories(
 )
 
 set(CMAKE_CXX_COMPILER "clang++")
-SET(CMAKE_CXX_FLAGS "-g -D_DEBUG -Wall -Werror -std=c++17 ")
+SET(CMAKE_CXX_FLAGS "-D_DEBUG -D_ANSYC_LOG  -Wall -Werror -fno-omit-frame-pointer -std=c++17 ")
 # 设置 Debug 模式下的编译选项
-set(CMAKE_CXX_FLAGS_DEBUG "-O1 -fsanitize=address -fno-omit-frame-pointer")
+set(CMAKE_CXX_FLAGS_DEBUG "-O1 ")
 # 设置 Release 模式下的编译选项
 set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
 
-set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_BUILD_TYPE RELEASE)
 
 
 find_package(Threads REQUIRED)
@@ -32,3 +32,4 @@ add_executable(echoserver ${EXAMPLE_ECHOSERVER_LIST} ${SRC_LIST1} ${SRC_LIST2} $
 target_link_libraries(echoserver ${CMAKE_THREAD_LIBS_INIT})
 
 add_executable(LogstreamTest ${SRC_LIST1} ${SRC_LIST3} "test/Log_test/Logstream_test.cpp")
+target_link_libraries(echoserver ${CMAKE_THREAD_LIBS_INIT})

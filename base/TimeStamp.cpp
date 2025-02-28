@@ -15,7 +15,7 @@ string TimeStamp::toString() const {
   return buf;
 }
 
-void TimeStamp::toFormattedString(char *desc, bool showMicroseconds) const {
+int  TimeStamp::toFormattedString(char *desc, bool showMicroseconds) const {
   memset(desc, 0, FORMAT_TIME_BUFSIZE);
   time_t seconds =
       static_cast<time_t>(microSecondsSinceEpoch_ / kMicroSecondsPerSecond);
@@ -32,10 +32,10 @@ void TimeStamp::toFormattedString(char *desc, bool showMicroseconds) const {
       static_cast<int>(microSecondsSinceEpoch_ % kMicroSecondsPerSecond);
 
   if (showMicroseconds)
-    snprintf(desc, FORMAT_TIME_BUFSIZE, "%4d-%02d-%02d %02d:%02d:%02d.%06d ", year,
+    return snprintf(desc, FORMAT_TIME_BUFSIZE, "%4d-%02d-%02d %02d:%02d:%02d.%06d ", year,
              month, day, hour, minute, second, microSeconds);
   else
-    snprintf(desc, FORMAT_TIME_BUFSIZE, "%4d-%02d-%02d %02d:%02d:%02d ", year,
+    return snprintf(desc, FORMAT_TIME_BUFSIZE, "%4d-%02d-%02d %02d:%02d:%02d ", year,
              month, day, hour, minute, second);
 }
 

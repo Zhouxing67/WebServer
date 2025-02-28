@@ -19,8 +19,8 @@ class Latch: public noncopyable_and_nonmoveable
     }
     void signal()
     {
-        count_--;
-        if (count_ <= 0)
+        std::unique_lock<mutex> lck;
+        if (--count_ <= 0)
             cv_.notify_all();
     }
 

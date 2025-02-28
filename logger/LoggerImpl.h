@@ -5,6 +5,7 @@
 #include "common.h"
 #include <unordered_map>
 
+//源代码文件
 struct SourceFile
 {
     SourceFile(const char *data) : data_(data), size_(static_cast<int>(strlen(data_)))
@@ -19,6 +20,14 @@ struct SourceFile
     int size_;
 };
 
+//string_view
+struct Template
+{
+    Template(const char *str, unsigned size) : str_(str), size_(size) {}
+    const char *str_;
+    const unsigned size_;
+};
+
 class LoggerImpl
 {
   public:
@@ -27,8 +36,8 @@ class LoggerImpl
 
     const char *format_level_string() const; // 获取LogLevel的字符串
     void FormattedTime();
-    // 完成格式化，并补充输出源码文件和源码位置
-    void finish();
+
+    void finish(); // 并补充输出源码文件和源码位置,构成一条完整日志信息。
 
     LOG_LEVEL level() const { return level_; }
     LogStream &stream() { return stream_; }
@@ -39,6 +48,12 @@ class LoggerImpl
     int line_;
     LogStream stream_;
 };
+
+inline LogStream &operator<<(LogStream &stream, Template v)
+{
+    stream.append(v.str_, v.size_);
+    return stream;
+}
 
 inline const char *LoggerImpl::format_level_string() const
 {

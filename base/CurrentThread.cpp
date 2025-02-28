@@ -1,6 +1,6 @@
 #include "CurrentThread.h"
-#include <sys/syscall.h>
 #include <stdio.h>
+#include <sys/syscall.h>
 #include <unistd.h>
 namespace CurrentThread
 {
@@ -20,7 +20,4 @@ namespace CurrentThread
             t_formattedTidLength = snprintf(t_formattedTid, sizeof(t_formattedTid), "%5d ", t_cachedTid);
         }
     }
-}
-
-
-
+} // namespace CurrentThread

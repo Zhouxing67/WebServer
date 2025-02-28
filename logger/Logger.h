@@ -8,7 +8,6 @@
 using std::unique_ptr;
 
 using OutputFunc = void (*)(const char *, int); // 输出操作
-using FlushFunc = void (*)();                   //刷新操作
 
 class LoggerImpl;
 class LogStream;
@@ -33,8 +32,9 @@ class Logger
     static LOG_LEVEL LEVEL();
     static void SET_LEVEL(LOG_LEVEL level);
     static void setOutput(OutputFunc); // 默认fwrite到stdout
-    static void setFlush(FlushFunc);   // 默认fflush到stdout
 
+    static void Async_Log();
+    static void Sync_Log();
   private:
     unique_ptr<LoggerImpl> impl_;
 };
