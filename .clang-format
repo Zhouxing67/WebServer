@@ -19,6 +19,7 @@ BraceWrapping:
 
 # Empty function body braces on the same line
 AllowShortFunctionsOnASingleLine: All
+AlwaysBreakTemplateDeclarations: Yes
 
 # Other common style options
 AlignConsecutiveMacros: true

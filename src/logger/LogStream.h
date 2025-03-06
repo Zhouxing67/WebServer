@@ -33,7 +33,9 @@ class LogStream
         buffer_.reset();
     }
 
-    template <class NumericalType> self &operator<<(NumericalType val);
+    template <class NumericalType>
+    self &operator<<(NumericalType val);
+    
     self &operator<<(const char *str);
     self &operator<<(bool bool_);
 
@@ -41,8 +43,8 @@ class LogStream
     Buffer buffer_;
 };
 
-
-template <class NumericalType> inline LogStream &LogStream::operator<<(NumericalType val)
+template <class NumericalType>
+inline LogStream &LogStream::operator<<(NumericalType val)
 {
     // 确保类型是算术类型
     static_assert(std::is_arithmetic<NumericalType>::value || std::is_same<NumericalType, std::string>::value,

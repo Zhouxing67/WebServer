@@ -7,7 +7,6 @@ If:                               # 设置配置文件的使用条件
 Index:
   Background: true            # 在后台索引项目代码
 
-
 Diagnostics:             # 诊断设置部分
   ClangTidy:             # Clang-Tidy 配置
     Add: [
