@@ -85,6 +85,8 @@ void TcpServer::handle_close_in_loop(const shared_ptr<TcpConnection> &conn)
     auto it = connectionsMap_.find(fd);
     assert(it != connectionsMap_.end());
 
+    (void)it;
+
     connectionsMap_.erase(connectionsMap_.find(fd));
     EventLoop *loop = conn->loop();
     loop->add_one_func([conn] { conn->delete_connection(); });

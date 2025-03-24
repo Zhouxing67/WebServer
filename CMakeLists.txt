@@ -6,6 +6,8 @@ include_directories(
     src/base
     src/tcp
     src/logger
+    src/timer
+    src/eventloop
 )
 
 set(CMAKE_CXX_COMPILER "clang++")
@@ -37,8 +39,8 @@ aux_source_directory(example/echo_server/ EXAMPLE_ECHOSERVER_LIST)
 
 set (EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin/)
 
-add_executable(echoserver ${EXAMPLE_ECHOSERVER_LIST} ${SRC_BASE} ${SRC_TCP} ${SRC_LOGGER} ${SRC_TIMER} ${SRC_EVENTLOOP})
+add_executable(echoserver ${EXAMPLE_ECHOSERVER_LIST} ${SRC_BASE} ${SRC_LOGGER} ${SRC_TIMER} ${SRC_EVENTLOOP} ${SRC_TCP})
 target_link_libraries(echoserver ${CMAKE_THREAD_LIBS_INIT})
 
-add_executable(LogstreamTest ${SRC_BASE} ${SRC_LOGGER}  "test/Log_test/Logstream_test.cpp")
+add_executable(LogstreamTest ${SRC_BASE} ${SRC_TIMER} ${SRC_LOGGER} ${SRC_EVENTLOOP}  "test/Log_test/Logstream_test.cpp")
 target_link_libraries(echoserver ${CMAKE_THREAD_LIBS_INIT})

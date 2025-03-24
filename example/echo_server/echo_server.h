@@ -1,7 +1,7 @@
 #ifndef ECHO_SERVER_H
 #define ECHO_SERVER_H
 
-#include "../../tcp/tcp.h"
+#include "tcp.h"
 #include <iostream>
 #include <functional>
 #include <arpa/inet.h>
