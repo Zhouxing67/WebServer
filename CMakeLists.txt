@@ -25,16 +25,20 @@ set(CMAKE_BUILD_TYPE RELEASE)
 
 find_package(Threads REQUIRED)
 
-aux_source_directory(src/base SRC_LIST1)
-aux_source_directory(src/tcp SRC_LIST2)
-aux_source_directory(src/logger SRC_LIST3)
+aux_source_directory(src/base SRC_BASE)
+aux_source_directory(src/tcp SRC_TCP)
+aux_source_directory(src/logger SRC_LOGGER)
+aux_source_directory(src/timer SRC_TIMER)
+aux_source_directory(src/eventloop SRC_EVENTLOOP)
+
+
 aux_source_directory(example/echo_server/ EXAMPLE_ECHOSERVER_LIST)
 
 
 set (EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin/)
 
-add_executable(echoserver ${EXAMPLE_ECHOSERVER_LIST} ${SRC_LIST1} ${SRC_LIST2} ${SRC_LIST3})
+add_executable(echoserver ${EXAMPLE_ECHOSERVER_LIST} ${SRC_BASE} ${SRC_TCP} ${SRC_LOGGER} ${SRC_TIMER} ${SRC_EVENTLOOP})
 target_link_libraries(echoserver ${CMAKE_THREAD_LIBS_INIT})
 
-add_executable(LogstreamTest ${SRC_LIST1} ${SRC_LIST3} "test/Log_test/Logstream_test.cpp")
+add_executable(LogstreamTest ${SRC_BASE} ${SRC_LOGGER}  "test/Log_test/Logstream_test.cpp")
 target_link_libraries(echoserver ${CMAKE_THREAD_LIBS_INIT})
