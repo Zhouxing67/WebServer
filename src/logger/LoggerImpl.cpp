@@ -3,6 +3,7 @@
 #include <cassert>
 #include <cstdio>
 #include <memory>
+#include <string_view>
 #include <utility>
 
 #include "AsyncLogger.h"
@@ -76,7 +77,7 @@ Logger::~Logger()
     int size = buf.size();
     global_output(buf.data(), size);
     fflush(stdout);
-    
+
     if (impl_->level() == LOG_LEVEL::FATAL) {
         abort();
     }
@@ -85,11 +86,14 @@ LogStream &Logger::stream() { return impl_->stream(); }
 
 LoggerImpl::LoggerImpl(SourceFile source, int line, LOG_LEVEL level) : level_(level), file_(source), line_(line)
 {
-    stream_ << Level_map_ANSI[level_];
+    if (global_output == defaultOutput)
+        stream_ << Level_map_ANSI[level_];
     FormattedTime();
     CurrentThread::tid();
-    stream_ << Template(CurrentThread::tidString(), CurrentThread::tidStringLength());
-    stream_ << Template(format_level_string(), 6);
+
+
+    stream_ << "thread_id:"<<string_view(CurrentThread::tidString(), CurrentThread::tidStringLength());
+    stream_ << string_view(format_level_string(), 6);
 }
 
 void LoggerImpl::FormattedTime()
@@ -101,7 +105,12 @@ void LoggerImpl::FormattedTime()
         now.toFormattedString(t_time);
         t_last_second = Usec;
     }
-    stream_ << Template(t_time, strlen(t_time));
+    stream_ << string_view(t_time, strlen(t_time));
 }
 
-void LoggerImpl::finish() { stream_ << " - " << file_.data_ << ":" << line_ << FINISH << "\n"; }
+void LoggerImpl::finish()
+{
+    stream_ << " - " << file_.data_ << ":" << line_ << "\n";
+    if (global_output == defaultOutput)
+        stream_ << FINISH;
+}

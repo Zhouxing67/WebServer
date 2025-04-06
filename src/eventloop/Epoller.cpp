@@ -22,6 +22,7 @@ Epoller::~Epoller() {
     close(epfd_);
   }
   epfd_ = -1;
+  delete events_;
 }
 
 void Epoller::update_channel(Channel *chl) {
@@ -52,7 +53,8 @@ vector<Channel *> Epoller::poll(int timeout) {
   if (nfds == -1) {
     if (errno != EINTR)
         LOG_ERROR << "epoll wait error";
-    else return vector<Channel *>();
+    else
+        return {};
   }
 
   vector<Channel *> activeChannels(nfds, nullptr);

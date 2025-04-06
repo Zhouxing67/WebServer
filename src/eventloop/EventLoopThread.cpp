@@ -19,6 +19,7 @@ EventLoop *EventLoopThread::startLoop()
     return loop;
 }
 
+//构造EventLoop对象
 void EventLoopThread::threadFunc()
 {
 

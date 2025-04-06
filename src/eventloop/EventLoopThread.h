@@ -28,7 +28,7 @@ private:
     mutex mut_;
     condition_variable cv_;
 
-    //构造EventLoopd对象
+    //构造EventLoop对象
     void threadFunc();
 };
 

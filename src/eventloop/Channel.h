@@ -24,8 +24,6 @@ public:
     ~Channel() { }
 
     void handle_event() const; // 处理事件
-
-
     void Tie(const shared_ptr<void> &obj); // 绑定
 
     void enable_read();  // 允许读

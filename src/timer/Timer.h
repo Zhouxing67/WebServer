@@ -17,6 +17,7 @@ public:
         expiration_(when), callback_(std::move(cb)), interval_(interval), repeat_(interval > 0.0)
     { }
 
+    ~Timer() = default;
     TimeStamp expiration() const { return expiration_; }
     double interval() const { return interval_; }
     bool is_repeat() const { return repeat_; }

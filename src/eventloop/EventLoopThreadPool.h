@@ -17,8 +17,8 @@ public:
 
     void start();
     EventLoop *get_next_loop();
-
     unsigned int get_concurrency() const { return concurrency_; }
+    
 private:
     EventLoop *main_reactor_loop_ = nullptr;
     vector<unique_ptr<EventLoopThread>> threads_;

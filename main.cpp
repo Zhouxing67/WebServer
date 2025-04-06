@@ -1,9 +1,4 @@
-#include "tcp/Acceptor.h"
-#include "tcp/EventLoop.h"
-#include "tcp/TcpServer.h"
-#include "tcp/Buffer.h"
-#include "tcp/ThreadPool.h"
-#include "tcp/TcpConnection.h"
+#include "TcpServer.h"
 #include <string.h>
 #include <iostream>
 #include <functional>

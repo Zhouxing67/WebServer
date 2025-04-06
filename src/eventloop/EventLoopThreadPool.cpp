@@ -26,7 +26,7 @@ void EventLoopThreadPool::start()
 EventLoop *EventLoopThreadPool::get_next_loop()
 {
     assert(started_);
-    static unsigned int next = get_next();
+    unsigned int next = get_next();
     EventLoop *sub_reactor_loop_ = sub_reactors_[next];
     return sub_reactor_loop_;
 }

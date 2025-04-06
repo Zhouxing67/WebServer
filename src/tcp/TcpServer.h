@@ -41,14 +41,14 @@ public:
     //设置连接的业务逻辑
     void set_message_callback(TcpConnectionCallbcak fn) { on_message_ = std::move(fn); }
 
-    void handle_shutdown( weak_ptr<TcpConnection> &conn);
+    void handle_shutdown( int fd);
     void handle_close(const shared_ptr<TcpConnection> &conn);
     void handle_close_in_loop(const shared_ptr<TcpConnection> &conn);
     void handle_new_connection(int fd);
 
 private:
     EventLoop *main_reactor_ = nullptr;
-    Second active_time_ = -1.0;
+    Second active_time_ = -1.0; //此时服务端不主动断开连接
 
     unique_ptr<Acceptor> acceptor_;
     vector<unique_ptr<EventLoop>> sub_reactors_;

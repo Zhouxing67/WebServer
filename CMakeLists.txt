@@ -11,7 +11,7 @@ include_directories(
 )
 
 set(CMAKE_CXX_COMPILER "clang++")
-SET(CMAKE_CXX_FLAGS "-D_DEBUG -D_ANSYC_LOG  -Wall -Werror -fno-omit-frame-pointer -std=c++17 ")
+SET(CMAKE_CXX_FLAGS "-D_DEBUG  -Wall -Werror -fno-omit-frame-pointer -std=c++17 ")
 # 启用 Clang 的颜色诊断
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fdiagnostics-color=always")
 # 指定使用 LLD 作为链接器

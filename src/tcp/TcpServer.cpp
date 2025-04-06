@@ -12,7 +12,6 @@
 using std::make_shared;
 using std::make_unique;
 
-
 TcpServer::TcpServer(const char *ip, const int port)
 {
     main_reactor_ = new EventLoop();
@@ -44,30 +43,30 @@ void TcpServer::handle_new_connection(int fd)
     // cout << "New connection fd: " << fd << endl;
     EventLoop *sub_reactors_ = thread_pool_->get_next_loop();
     shared_ptr<TcpConnection> conn = make_shared<TcpConnection>(sub_reactors_, fd, next_conn_id_);
-    sub_reactors_->run_after(active_time_, [this, conn] {
-        weak_ptr<TcpConnection> weak_conn(conn);
-        handle_shutdown(weak_conn);
-    });
 
     conn->set_connect_callback(on_connect_);
     conn->set_message_callback(on_message_);
     conn->set_close_callback([this](const shared_ptr<TcpConnection> &conn) { handle_close(conn); });
     connectionsMap_[fd] = conn;
     conn->establish_connection();
+
+    if (active_time_ != -1.0) {
+        sub_reactors_->run_after(active_time_, [this, fd] { handle_shutdown(fd); });
+    }
 }
 
-void TcpServer::handle_shutdown(weak_ptr<TcpConnection> &conn)
+void TcpServer::handle_shutdown(int fd)
 {
-    if (active_time_ == -1)
-        return;
-    shared_ptr<TcpConnection> conn_lock = conn.lock();
-    if (conn_lock) {
+    if (auto itr = connectionsMap_.find(fd); itr != connectionsMap_.end()) {
+        LOG_DEBUG << "SERVER CLOSE CONNECTION";   
+        shared_ptr<TcpConnection> conn_lock = itr->second;
+
         TimeStamp close_time = conn_lock->timestamp() + active_time_;
         if (close_time < TimeStamp::Now())
             conn_lock->handle_close();
         else {
             EventLoop *bind_loop = conn_lock->loop();
-            bind_loop->run_at(close_time, [this, &conn] { handle_shutdown(conn); });
+            bind_loop->run_at(close_time, [this, fd] { handle_shutdown(fd); });
         }
     }
 }

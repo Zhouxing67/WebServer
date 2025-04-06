@@ -42,7 +42,7 @@ private:
     mutex mut_;
 
     //执行EventLoop::loop的线程id（所有的EventLoop都由主线程创建，但sub_reactor的EventLoop::loop的调用会被分配到子线程）
-    pid_t tid_;
+    const pid_t tid_;
 
     int wakeup_fd_;
     unique_ptr<Channel> wakeup_channel_;

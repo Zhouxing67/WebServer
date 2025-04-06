@@ -4,6 +4,7 @@
 #include <sys/socket.h>
 #include <cstring>
 
+#include "Logger.h"
 #include "TcpConnection.h"
 #include "Buffer.h"
 #include "Channel.h"
@@ -31,6 +32,7 @@ TcpConnection::TcpConnection(EventLoop *loop, int connfd, int connid) : connfd_(
 
 TcpConnection::~TcpConnection()
 {
+    LOG_DEBUG << "CLOSE TCPCONNECTION";
     ::close(connfd_);
 }
 
